@@ -23,6 +23,8 @@ public class PedidoEstado implements Serializable {
     @Column(name = "fecha_registro")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaRegistro;
+    @Column(name = "detalle")
+    private String detalle;
     @JoinColumn(name = "id_pedido", referencedColumnName = "id_pedido")
     @ManyToOne(optional = false)
     private Pedido pedido;
@@ -35,7 +37,6 @@ public class PedidoEstado implements Serializable {
     @JoinColumn(name = "id_razon_anulacion", referencedColumnName = "id_razon_anulacion")
     @ManyToOne(optional = true)
     private RazonAnulacion razonAnulacion;
-
 
     @Override
     public boolean equals(Object o) {

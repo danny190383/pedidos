@@ -25,6 +25,10 @@ public class EstadoPedido implements Serializable {
     @Column(name = "estado")
     private Boolean estado;
 
+    public EstadoPedido(Long idEstadoPedido) {
+        this.idEstadoPedido = idEstadoPedido;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

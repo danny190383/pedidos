@@ -6,6 +6,8 @@ import java.util.List;
 public interface IRazonAnulacionService {
     List<RazonAnulacion> listar();
 
+    List<RazonAnulacion> listarActivas();
+
     void eliminarRazonAnulacion(RazonAnulacion razonAnulacion);
 
     void guardarRazonAnulacion(RazonAnulacion razonAnulacion);

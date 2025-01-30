@@ -6,10 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -39,12 +37,32 @@ public class Pedido implements Serializable {
     private Usuario usuarioRegistra;
     @Column(name = "total")
     private BigDecimal total;
+    @Column(name = "detalle")
+    private String detalle;
     @OneToMany(mappedBy = "pedido", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PedidoEstado> pedidoEstadoLst = new ArrayList<>();
     @OneToMany(mappedBy = "pedido", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PedidoCamion> pedidoCamionLst = new ArrayList<>();
     @OneToMany(mappedBy = "pedido", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PedidoDetalle> pedidoDetalleLst = new ArrayList<>();
+
+    public List<PedidoEstado> getPedidoEstadoOrderLst() {
+        if (pedidoEstadoLst == null || pedidoEstadoLst.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return pedidoEstadoLst.stream()
+                .sorted(Comparator.comparing(PedidoEstado::getFechaRegistro).reversed())
+                .collect(Collectors.toList());
+    }
+
+    public Boolean estaAnulado() {
+        if (pedidoEstadoLst == null || pedidoEstadoLst.isEmpty()) {
+            return false;
+        }
+        return pedidoEstadoLst.stream()
+                .anyMatch(pedidoEstado -> pedidoEstado.getEstadoPedido() != null
+                        && pedidoEstado.getEstadoPedido().getIdEstadoPedido() == 4L);
+    }
 
     @Override
     public boolean equals(Object o) {

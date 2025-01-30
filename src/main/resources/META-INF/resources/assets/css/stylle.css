@@ -47,6 +47,11 @@ body {
     width: 50% !important;
 }
 
+.topAlignedTres {
+    vertical-align: top !important;
+    width: 33% !important;
+}
+
 body .ui-menu {
     background: none !important;
     border: none !important;

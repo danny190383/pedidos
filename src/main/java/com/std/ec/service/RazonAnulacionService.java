@@ -18,6 +18,11 @@ public class RazonAnulacionService implements IRazonAnulacionService {
     }
 
     @Override
+    public List<RazonAnulacion> listarActivas() {
+        return (List<RazonAnulacion>) razonAnulacionRepository.listarActivas();
+    }
+
+    @Override
     public void eliminarRazonAnulacion(RazonAnulacion razonAnulacion){
         razonAnulacionRepository.delete(razonAnulacion);
     }

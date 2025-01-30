@@ -3,6 +3,7 @@ package com.std.ec.controller;
 import com.std.ec.entity.*;
 import com.std.ec.service.impl.IEstacionServicioService;
 import com.std.ec.service.impl.IPedidoService;
+import com.std.ec.service.impl.IRazonAnulacionService;
 import com.std.ec.util.FacesUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.view.ViewScoped;
@@ -27,19 +28,28 @@ public class PedidoBean implements Serializable {
     private IPedidoService pedidoService;
     @Autowired
     private IEstacionServicioService estacionServicioService;
+    @Autowired
+    private IRazonAnulacionService razonAnulacionService;
     @Inject
     private UserSessionBean userSession;
 
     private Pedido pedido;
     private List<EstacionServicio> estacionServicioLst;
+    private List<RazonAnulacion> listRazonAnulacion;
+    private Boolean nuevoRegistro;
+    private Boolean anulando;
+    private PedidoEstado pedidoEstadoAnulado;
 
     public PedidoBean() {
         pedido = new Pedido();
         estacionServicioLst = new ArrayList<>();
+        pedidoEstadoAnulado = new PedidoEstado();
+        pedidoEstadoAnulado.setRazonAnulacion(new RazonAnulacion());
     }
 
     @PostConstruct
     public void init(){
+        listRazonAnulacion = razonAnulacionService.listarActivas();
         estacionServicioLst.addAll(estacionServicioService.listarActivas());
         this.nuevoPedido();
     }
@@ -52,6 +62,19 @@ public class PedidoBean implements Serializable {
         pedido.setTotal(BigDecimal.ZERO);
         pedido.setEstacionServicio(new EstacionServicio());
         pedido.setTerminal(new Terminal());
+        this.nuevoRegistro = true;
+        this.anulando = false;
+    }
+
+    public void generarAnular(){
+        pedidoEstadoAnulado = new PedidoEstado();
+        pedidoEstadoAnulado.setPedido(pedido);
+        pedidoEstadoAnulado.setFechaRegistro(new Date());
+        pedidoEstadoAnulado.setUsuarioRegistra(userSession.getUsuario());
+        pedidoEstadoAnulado.setEstadoPedido(new EstadoPedido(4L));
+        pedidoEstadoAnulado.setRazonAnulacion(new RazonAnulacion());
+        this.nuevoRegistro = false;
+        this.anulando = true;
     }
 
     public void seleccionarEstacionServicio(){
@@ -85,6 +108,21 @@ public class PedidoBean implements Serializable {
 
     public void guardar(){
         try {
+            if(this.pedido.getTotal().compareTo(BigDecimal.ZERO) != 1){
+                FacesUtils.addErrorMessage("El pedido debe ser mayor que 0.");
+                return;
+            }
+            if(this.nuevoRegistro){
+                PedidoEstado pedidoEstado = new PedidoEstado();
+                pedidoEstado.setPedido(pedido);
+                pedidoEstado.setFechaRegistro(new Date());
+                pedidoEstado.setUsuarioRegistra(userSession.getUsuario());
+                pedidoEstado.setEstadoPedido(new EstadoPedido(1L));
+                pedido.getPedidoEstadoLst().add(pedidoEstado);
+            }
+            if(this.anulando){
+                pedido.getPedidoEstadoLst().add(pedidoEstadoAnulado);
+            }
             pedidoService.guardarPedido(this.pedido);
             FacesUtils.addInfoMessage("Registro guardado.");
         } catch (Exception e) {
@@ -128,6 +166,8 @@ public class PedidoBean implements Serializable {
         Pedido pedidoSlc = (Pedido) event.getObject();
         if(pedidoSlc != null){
             this.pedido = pedidoSlc;
+            this.nuevoRegistro = false;
+            this.anulando = false;
         }
     }
 
@@ -145,5 +185,21 @@ public class PedidoBean implements Serializable {
 
     public void setEstacionServicioLst(List<EstacionServicio> estacionServicioLst) {
         this.estacionServicioLst = estacionServicioLst;
+    }
+
+    public List<RazonAnulacion> getListRazonAnulacion() {
+        return listRazonAnulacion;
+    }
+
+    public void setListRazonAnulacion(List<RazonAnulacion> listRazonAnulacion) {
+        this.listRazonAnulacion = listRazonAnulacion;
+    }
+
+    public PedidoEstado getPedidoEstadoAnulado() {
+        return pedidoEstadoAnulado;
+    }
+
+    public void setPedidoEstadoAnulado(PedidoEstado pedidoEstadoAnulado) {
+        this.pedidoEstadoAnulado = pedidoEstadoAnulado;
     }
 }

@@ -21,9 +21,23 @@
                                      update="@form,formulario:grMensajes"/>
                     <p:spacer width="10px" />
                     <p:commandButton value="Guardar"
+                                     disabled="#{pedidoBean.pedido.estaAnulado()}"
                                      actionListener="#{pedidoBean.guardar}"
                                      icon="pi pi-save"
                                      process="@form"
+                                     update="@form,formulario:grMensajes">
+                        <p:confirm header="Contirmación"
+                                   message="Desea guardar el registro?"
+                                   icon="pi pi-info-circle"/>
+                    </p:commandButton>
+                    <p:spacer width="10px" />
+                    <p:commandButton value="Anular"
+                                     actionListener="#{pedidoBean.generarAnular}"
+                                     icon="pi pi-thumbs-down"
+                                     process="@this"
+                                     disabled="#{pedidoBean.pedido.estaAnulado() ||
+                                                pedidoBean.pedido.idPedido eq null}"
+                                     oncomplete="PF('dlgAnular').show()"
                                      update="@form,formulario:grMensajes"/>
                     <p:spacer width="10px" />
                     <p:commandButton icon="pi pi-search"
@@ -37,89 +51,76 @@
                 </p:toolbarGroup>
             </p:toolbar>
             <br/>
-            <h:panelGrid columns="2"
-                         width="60%"
-                         styleClass="topAligned,topAligned">
-                <p:fieldset id="flsMenu0001"
-                            style="height:150px"
-                            legend="Datos Generales">
-                    <h:panelGrid columns="2">
-                        <p:outputLabel value="CÓDIGO:"
-                                       styleClass="texto_negrita"/>
-                        <p:outputLabel value="#{pedidoBean.pedido.codigo}"
-                                       styleClass="texto_negrita"/>
+            <h:panelGrid columns="3" width="100%"
+                            columnClasses="topAlignedTres,topAlignedTres,topAlignedTres">
+                <p:fieldset id="flsMenu0001" style="height: 200px;" legend="Datos Generales">
+                    <h:panelGrid columns="2"
+                                 width="90%">
+                        <p:outputLabel value="CÓDIGO:" styleClass="texto_negrita"/>
+                        <p:outputLabel value="#{pedidoBean.pedido.codigo}" styleClass="texto_negrita"/>
 
-                        <p:outputLabel value="FECHA:"
-                                       styleClass="texto_negrita"/>
+                        <p:outputLabel value="FECHA:" styleClass="texto_negrita"/>
                         <p:outputLabel value="#{pedidoBean.pedido.fechaRegistro}"
                                        styleClass="texto_negrita">
-                            <f:convertDateTime timeZone="#{parametrosApplication.timeZone}"
-                                               pattern="#{parametrosApplication.formatoFechaHoraSMS}"/>
+                            <f:convertDateTime timeZone="#{parametrosApplication.timeZone}" pattern="#{parametrosApplication.formatoFechaHoraSMS}"/>
                         </p:outputLabel>
 
-                        <p:outputLabel value="RESPONSABLE:"
-                                       styleClass="texto_negrita"/>
-                        <p:outputLabel value="#{pedidoBean.pedido.usuarioRegistra.empleado.persona.nombreApellido}"
-                                       styleClass="texto_negrita"/>
+                        <p:outputLabel value="RESPONSABLE:" styleClass="texto_negrita"/>
+                        <p:outputLabel value="#{pedidoBean.pedido.usuarioRegistra.empleado.persona.nombreApellido}" styleClass="texto_negrita"/>
 
+                        <p:outputLabel value="DETALLE:" styleClass="texto_negrita"/>
+                        <h:panelGrid columns="1" width="100%">
+                            <p:inputTextarea rows="3" style="width: 90%"
+                                             value="#{pedidoBean.pedido.detalle}"
+                                             counter="display1"
+                                             maxlength="500"
+                                             counterTemplate="{0} caracteres restantes."
+                                             autoResize="false"/>
+                            <h:outputText id="display1" class="block" />
+                        </h:panelGrid>
                     </h:panelGrid>
                 </p:fieldset>
-                <p:fieldset id="flsMenu0002"
-                            style="height:150px"
-                            legend="Datos Pedido">
-                    <h:panelGrid columns="2"
-                                 style="width: 100%;" columnClasses="label-column, input-column">
-                        <p:outputLabel value="ESTACIÓN:"
-                                       styleClass="texto_negrita"/>
-                        <p:selectOneMenu styleClass="full-width"
-                                         id="slcEstacion"
-                                         style="width: 100%;"
-                                         disabled="#{pedidoBean.pedido.terminal.idTerminal ne null}"
-                                         value="#{pedidoBean.pedido.estacionServicio.idEstacionServicio}"
-                                         required="true"
-                                         requiredMessage="Estación: Campo obligatorio."
-                                         filter="true" filterMatchMode="startsWith">
-                            <f:selectItem itemLabel="--Seleccione--"
-                                          noSelectionOption="true"/>
-                            <f:selectItems value="#{pedidoBean.estacionServicioLst}"
-                                           var="estacion"
-                                           itemLabel="#{estacion.nombre}"
-                                           itemValue="#{estacion.idEstacionServicio}" />
-                            <p:ajax event="change"
-                                    process="@this"
-                                    listener="#{pedidoBean.seleccionarEstacionServicio}"
-                                    update="formulario:grMensajes, formulario:slcTerminal"/>
+
+                <p:fieldset id="flsMenu0002" style="height: 200px;" legend="Datos Pedido">
+                    <h:panelGrid columns="2" style="width: 100%;" columnClasses="label-column, input-column">
+                        <p:outputLabel value="ESTACIÓN:" styleClass="texto_negrita"/>
+                        <p:selectOneMenu styleClass="full-width" id="slcEstacion" style="width: 100%;" disabled="#{pedidoBean.pedido.terminal.idTerminal ne null}" value="#{pedidoBean.pedido.estacionServicio.idEstacionServicio}" required="true" requiredMessage="Estación: Campo obligatorio." filter="true" filterMatchMode="startsWith">
+                            <f:selectItem itemLabel="--Seleccione--" noSelectionOption="true"/>
+                            <f:selectItems value="#{pedidoBean.estacionServicioLst}" var="estacion" itemLabel="#{estacion.nombre}" itemValue="#{estacion.idEstacionServicio}" />
+                            <p:ajax event="change" process="@this" listener="#{pedidoBean.seleccionarEstacionServicio}" update="formulario:grMensajes, formulario:slcTerminal"/>
                         </p:selectOneMenu>
 
-                        <p:outputLabel value="TERMINAL:"
-                                       styleClass="texto_negrita"/>
-                        <p:selectOneMenu styleClass="full-width"
-                                         id="slcTerminal"
-                                         style="width: 100%;"
-                                         disabled="#{pedidoBean.pedido.pedidoDetalleLst.size() > 0}"
-                                         value="#{pedidoBean.pedido.terminal.idTerminal}"
-                                         required="true"
-                                         requiredMessage="Terminal: Campo obligatorio."
-                                         filter="true" filterMatchMode="startsWith">
-                            <f:selectItem itemLabel="--Seleccione--"
-                                          noSelectionOption="true"/>
-                            <f:selectItems value="#{pedidoBean.pedido.estacionServicio.terminalList}"
-                                           var="terminal"
-                                           itemLabel="#{terminal.nombre}"
-                                           itemValue="#{terminal.idTerminal}" />
-                            <p:ajax event="change"
-                                    process="@this"
-                                    listener="#{pedidoBean.seleccionarTerminal}"
-                                    update="formulario:grMensajes, formulario:flsMenu0003, formulario:slcEstacion"/>
+                        <p:outputLabel value="TERMINAL:" styleClass="texto_negrita"/>
+                        <p:selectOneMenu styleClass="full-width" id="slcTerminal" style="width: 100%;" disabled="#{pedidoBean.pedido.pedidoDetalleLst.size() > 0}" value="#{pedidoBean.pedido.terminal.idTerminal}" required="true" requiredMessage="Terminal: Campo obligatorio." filter="true" filterMatchMode="startsWith">
+                            <f:selectItem itemLabel="--Seleccione--" noSelectionOption="true"/>
+                            <f:selectItems value="#{pedidoBean.pedido.estacionServicio.terminalList}" var="terminal" itemLabel="#{terminal.nombre}" itemValue="#{terminal.idTerminal}" />
+                            <p:ajax event="change" process="@this" listener="#{pedidoBean.seleccionarTerminal}" update="formulario:grMensajes, formulario:flsMenu0003, formulario:slcEstacion"/>
                         </p:selectOneMenu>
 
-                        <p:outputLabel value="TOTAL PEDIDO:"
-                                       styleClass="texto_negrita"/>
-                        <p:outputLabel value="#{pedidoBean.pedido.total}"
-                                       styleClass="texto_negrita"
-                                       id="totalPedido"
-                                       style="font-size: 13px;color: red"/>
+                        <p:outputLabel value="TOTAL PEDIDO:" styleClass="texto_negrita"/>
+                        <p:outputLabel value="#{pedidoBean.pedido.total}" styleClass="texto_negrita" id="totalPedido" style="font-size: 13px;color: red"/>
                     </h:panelGrid>
+                </p:fieldset>
+
+                <p:fieldset id="flsMenu0005"
+                            style="height: 200px;"
+                            legend="Estado">
+                    <p:dataTable id="estadoLst"
+                                 var="estado"
+                                 scrollable="true" scrollHeight="100"
+                                 value="#{pedidoBean.pedido.pedidoEstadoOrderLst}">
+                        <p:column headerText="Fecha">
+                            <h:outputText value="#{estado.fechaRegistro}">
+                                <f:convertDateTime timeZone="#{parametrosApplication.timeZone}" pattern="#{parametrosApplication.formatoFechaHoraSMS}"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Responsable">
+                            <h:outputText value="#{estado.usuarioRegistra.empleado.persona.nombreApellido}" />
+                        </p:column>
+                        <p:column headerText="Estado">
+                            <h:outputText value="#{estado.estadoPedido.nombre}" />
+                        </p:column>
+                    </p:dataTable>
                 </p:fieldset>
             </h:panelGrid>
             <br/>
@@ -131,6 +132,7 @@
                     <p:commandButton actionListener="#{pedidoBean.agregarDetalle(item)}"
                                      value="#{item.nombre}"
                                      process="@this"
+                                     disabled="#{pedidoBean.pedido.estaAnulado()}"
                                      update="formulario:flsMenu0004, formulario:totalPedido, formulario:slcTerminal"
                                      styleClass="rounded-button" />
                     <p:spacer width="10px" />
@@ -152,6 +154,7 @@
 
                         <p:column headerText="Opciones"
                                   width="5%"
+                                  rendered="#{!pedidoBean.pedido.estaAnulado()}"
                                   style="text-align: center">
                             <p:commandButton icon="pi pi-trash"
                                              actionListener="#{pedidoBean.eliminar(index)}"
@@ -204,5 +207,59 @@
                 </h:panelGrid>
             </p:fieldset>
         </p:panel>
+    </ui:define>
+    <ui:define name="dialog">
+        <p:dialog header="Anular"
+                  id="dlgAnularId"
+                  widgetVar="dlgAnular"
+                  minHeight="40"
+                  width="40%"
+                  showEffect="fade"
+                  modal="true"
+                  closeOnEscape="true">
+
+            <h:panelGrid columns="2"
+                         id="pnlDatosAnular"
+                         width="90%">
+                <p:outputLabel value="Razón Anula:" styleClass="texto_negrita"/>
+                <p:selectOneMenu styleClass="full-width" id="slcRazon" style="width: 100%;"
+                                 value="#{pedidoBean.pedidoEstadoAnulado.razonAnulacion.idRazonAnulacion}"
+                                 required="true"
+                                 requiredMessage="Razón Anula: Campo obligatorio."
+                                 filter="true" filterMatchMode="startsWith">
+                    <f:selectItem itemLabel="--Seleccione--" noSelectionOption="true"/>
+                    <f:selectItems value="#{pedidoBean.listRazonAnulacion}"
+                                   var="razon"
+                                   itemLabel="#{razon.nombre}"
+                                   itemValue="#{razon.idRazonAnulacion}" />
+                </p:selectOneMenu>
+
+                <p:outputLabel value="Detalle:" styleClass="texto_negrita"/>
+                <h:panelGrid columns="1" width="100%">
+                    <p:inputTextarea rows="5" style="width: 90%"
+                                     value="#{pedidoBean.pedidoEstadoAnulado.detalle}"
+                                     counter="display"
+                                     maxlength="500"
+                                     counterTemplate="{0} caracteres restantes."
+                                     autoResize="false"/>
+                    <h:outputText id="display" class="block" />
+                </h:panelGrid>
+            </h:panelGrid>
+            <br/>
+            <h:panelGrid columns="3" style="margin: 0 auto">
+                <p:commandButton value="Guardar"
+                                 actionListener="#{pedidoBean.guardar}"
+                                 icon="pi pi-save"
+                                 oncomplete="PF('dlgAnular').hide()"
+                                 process="@this,pnlDatosAnular"
+                                 update="pnlDatosAnular, formulario:estadoLst, formulario:grMensajes"/>
+                <p:spacer width="5"/>
+                <p:commandButton value="Cancelar"
+                                 icon="pi pi-times"
+                                 process="@this"
+                                 update="@form"
+                                 oncomplete="PF('dlgAnular').hide()"/>
+            </h:panelGrid>
+        </p:dialog>
     </ui:define>
 </ui:composition>
