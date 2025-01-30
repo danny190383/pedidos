@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:h="jakarta.faces.html"
+      xmlns:p="primefaces">
+
+    <h:head>
+        <title>Busqueda de Empleados</title>
+        <h:outputStylesheet library="assets" name="css/primeflex.css"/>
+        <h:outputStylesheet library="assets" name="css/primeicons.css"/>
+        <h:outputStylesheet library="assets" name="css/stylle.css"/>
+    </h:head>
+
+    <h:body style="font-family: var(--font-family);">
+        <h:form>
+	        <p:dataTable var="empleado"
+	                     paginator="true"
+	                     rows="5"
+	                     id="tblEmpleados"
+	                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+	                     value="#{buscarEmpleadoBean.lazyModel}">
+	
+	            <p:column width="5%">
+					<p:commandButton icon="pi pi-check"
+									 actionListener="#{buscarEmpleadoBean.selectEmpleadoFromDialog(empleado)}"/>
+	            </p:column>
+	
+	            <p:column headerText="Cédula"
+						  field="persona.cedula"
+	                      filterBy="#{empleado.persona.cedula}"
+	                      sortBy="#{empleado.persona.cedula}"
+	                      filterPlaceholder="Cédula">
+	                <h:outputText value="#{empleado.persona.cedula}"/>
+	            </p:column>
+	
+	            <p:column headerText="Nombres"
+						  field="persona.nombres"
+	                      filterBy="#{empleado.persona.nombres}"
+	                      sortBy="#{empleado.persona.nombres}"
+	                      filterPlaceholder="Nombres">
+	                <h:outputText value="#{empleado.persona.nombres}"/>
+	            </p:column>
+	
+	            <p:column headerText="Apellidos"
+						  field="persona.apellidos"
+	                      filterBy="#{empleado.persona.apellidos}"
+	                      sortBy="#{empleado.persona.apellidos}"
+	                      filterPlaceholder="Apellidos">
+	                <h:outputText value="#{empleado.persona.apellidos}"/>
+	            </p:column>
+	
+	            <p:column headerText="Teléfono">
+	                <h:outputText value="#{empleado.persona.telefono}"/>
+	            </p:column>
+	
+	        </p:dataTable>
+        </h:form>
+    </h:body>
+</html>

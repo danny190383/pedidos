@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces">
+<h:head>
+    <title><ui:insert name="titulo"/></title>
+    <meta content='text/html; charset=UTF-8' http-equiv="Content-Type"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="mobile-web-app-capable" content="yes"/>
+    <h:outputStylesheet library="assets" name="css/primeicons.css"/>
+    <h:outputStylesheet library="assets" name="css/stylle.css"/>
+    <h:outputStylesheet library="assets" name="css/cssLayout.css"/>
+    <h:outputStylesheet library="assets" name="css/tablasPrimefaces.css"/>
+    <style>
+        html {
+            height: auto !important;
+        }
+    </style>
+</h:head>
+<h:body  style="height: 100%;">
+    <div id="top">
+        <ui:insert name="top">
+            <h:form id="frmMenuSecundario">
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; background: linear-gradient(to bottom, #ffffff, #e5f2fc, #c6dff0, #a3cde4);">
+                    <!-- Primera columna -->
+                    <div style="display: flex; align-items: center;margin-left: 10px;">
+                        <img src="/assets/image/logoLogin.png"
+                             alt="PS"
+                             style="width: 70px; height: 35px; vertical-align: middle;" />
+
+                        <p:spacer width="10px" />
+                        <ui:repeat value="#{userSessionBean.rutasAcceso}" var="item">
+                            <p:linkButton outcome="#{item.rutaUrl}"
+                                          value="#{item.nombre}"
+                                          styleClass="ui-button-raised ui-button-flat" />
+                            <p:spacer width="10px" />
+                        </ui:repeat>
+                    </div>
+
+                    <!-- Segunda columna -->
+                    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 20px; text-align: center;margin-right: 10px;">
+                        <!-- Contenedor para la imagen y el nombre -->
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            <img src="/assets/image/user.png"
+                                 alt="Usuario"
+                                 style="width: 30px; height: 30px; border-radius: 50%; border: 2px solid #007ad9;" />
+                            <span style="font-weight: bold; color: #333; margin-top: 5px;">#{userSessionBean.usuario.empleado.persona.nombreApellido}</span>
+                        </div>
+
+                        <!-- Botón de cerrar sesión -->
+                        <p:link href="#{request.contextPath}/logout" icon="pi pi-power-off" style="display: flex; align-items: center;">
+                            <img src="/assets/image/cerrar.png"
+                                 alt="Cerrar Sesión"
+                                 style="width: 35px; height: 35px; vertical-align: middle;" />
+                        </p:link>
+                    </div>
+                </div>
+            </h:form>
+        </ui:insert>
+    </div>
+    <div>
+        <div class="caja-botones-izquierda">
+            <h:form>
+                <p:linkButton outcome="/home.xhtml" style="padding: 0; border: none; background: none;">
+                    <img src="/assets/image/hogar.png"
+                         alt="PS"
+                         style="width: 30px; height: 30px;" />
+                </p:linkButton>
+
+                <p:menu model="#{userSessionBean.menuModulosAcceos}"
+                        style="width: fit-content;margin-left: 5px;"/>
+            </h:form>
+        </div>
+        <div id="content" class="center_content">
+            <h:form id="formulario">
+                <p:growl id="grMensajes"
+                         widgetVar="grMensajes"
+                         showDetail="false"
+                         class="grow"/>
+                <p:confirmDialog global="true"
+                                 showEffect="fade"
+                                 hideEffect="fade"
+                                 responsive="true"
+                                 width="350">
+                    <p:commandButton value="No"
+                                     type="button"
+                                     styleClass="ui-confirmdialog-no ui-button-flat"/>
+                    <p:commandButton value="Si"
+                                     type="button"
+                                     styleClass="ui-confirmdialog-yes" />
+                </p:confirmDialog>         
+                <ui:insert name="content"/>
+            </h:form>
+        </div>
+    </div>
+    <h:form id="frmDialog">
+        <ui:insert name="dialog"/>
+    </h:form>
+</h:body>
+</html>

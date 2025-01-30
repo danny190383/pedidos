@@ -1,0 +1,102 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="jakarta.faces.html"
+        xmlns:ui="jakarta.faces.facelets"
+        xmlns:f="http://java.sun.com/jsf/core"
+        template="../templates/templateMenu.xhtml"
+        xmlns:p="primefaces">
+
+    <ui:define name="titulo">
+        Roles Sistema
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="MANTENIMIENTO DE ROLES"
+                 styleClass="custom-panel">
+            <p:dataTable var="rol"
+                         paginator="true"
+                         rows="10"
+                         id="tblRoles"
+                         value="#{rolBean.listRoles}"
+                         rowIndexVar="index">
+
+                <f:facet name="header">
+                    <p:commandButton value="Nuevo"
+                                     update="frmDialog:dlgRolId"
+                                     icon="pi pi-external-link"
+                                     actionListener="#{rolBean.nuevo()}"
+                                     oncomplete="PF('dlgRol').show()"/>
+                </f:facet>
+
+                <p:column headerText="Opciones"
+                          width="5%">
+                    <h:panelGroup styleClass="botonera-opciones">
+                        <p:commandButton icon="pi pi-trash"
+                                         actionListener="#{rolBean.eliminar(index)}"
+                                         styleClass="rounded-button ui-button-outlined"
+                                         update="tblRoles, formulario:grMensajes">
+                            <p:confirm header="Contirmación"
+                                       message="Desea eliminar el registro?"
+                                       icon="pi pi-info-circle"/>
+                        </p:commandButton>
+
+                        <p:commandButton icon="pi pi-pencil"
+                                         styleClass="rounded-button ui-button-outlined"
+                                         update="frmDialog:dlgRolId"
+                                         oncomplete="PF('dlgRol').show()"
+                                         process="tblRoles"
+                                         action="#{rolBean.seleccionar(rol)}"/>
+                    </h:panelGroup>
+                </p:column>
+
+                <p:column headerText="Rol"
+                          sortBy="#{rol.nombre}"
+                          filterBy="#{rol.nombre}"
+                          filterMatchMode="contains"
+                          filterPlaceholder="Nombre">
+                    <h:outputText value="#{rol.nombre}"/>
+                </p:column>
+
+            </p:dataTable>
+        </p:panel>
+    </ui:define>
+    <ui:define name="dialog">
+        <p:dialog header="Rol"
+                  id="dlgRolId"
+                  widgetVar="dlgRol"
+                  minHeight="40"
+                  width="20%"
+                  showEffect="fade"
+                  modal="true"
+                  closeOnEscape="true">
+
+            <h:panelGrid columns="2"
+                         id="pnlDatosRol"
+                         width="90%">
+                <p:outputLabel value="Nombre"
+                               for="txtNombre"
+                               styleClass="texto_negrita"/>
+                <p:inputText value="#{rolBean.rol.nombre}"
+                             required="true"
+                             maxlength="20"
+                             styleClass="full-width"
+                             id="txtNombre"
+                             requiredMessage="Nombre: Campo obligatorio."/>
+            </h:panelGrid>
+            <br/>
+            <h:panelGrid columns="3" style="margin: 0 auto">
+                <p:commandButton value="Guardar"
+                                 actionListener="#{rolBean.guardar}"
+                                 icon="pi pi-save"
+                                 process="@this,pnlDatosRol"
+                                 update="pnlDatosRol, formulario:tblRoles, formulario:grMensajes"/>
+                <p:spacer width="5"/>
+                <p:commandButton value="Cancelar"
+                                 icon="pi pi-times"
+                                 process="@this"
+                                 update="@form"
+                                 oncomplete="PF('dlgRol').hide()"/>
+            </h:panelGrid>
+        </p:dialog>
+    </ui:define>
+</ui:composition>

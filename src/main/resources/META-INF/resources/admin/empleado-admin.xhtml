@@ -1,0 +1,204 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="jakarta.faces.html"
+        xmlns:ui="jakarta.faces.facelets"
+        template="../templates/templateMenu.xhtml"
+        xmlns:p="primefaces"
+        xmlns:f="http://java.sun.com/jsf/core">
+
+    <ui:define name="titulo">
+        Empleados Admin
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="ADMINISTRACIÓN DE EMPLEADOS"
+                 styleClass="custom-panel">
+            <p:dataTable var="empleado"
+                         paginator="true"
+                         rows="10" 
+                         id="tblEmpleados" 
+                         value="#{empleadosBean.listEmpleados}"
+                         rowIndexVar="index">
+
+                <f:facet name="header">
+                    <p:commandButton value="Nuevo" 
+                                     update="frmDialog:dlgEmpleadoId"
+                                     icon="pi pi-external-link"
+                                     actionListener="#{empleadosBean.nuevo()}"
+                                     oncomplete="PF('dlgEmpleado').show()"/>
+                </f:facet>
+
+                <p:column headerText="Opciones"
+                          width="5%">
+                    <h:panelGroup styleClass="botonera-opciones">
+                        <p:commandButton icon="pi pi-trash"
+                                         actionListener="#{empleadosBean.eliminar(index)}"
+                                         styleClass="rounded-button ui-button-outlined"
+                                         update="tblEmpleados, formulario:grMensajes">
+                            <p:confirm header="Contirmación"
+                                       message="Desea eliminar el registro?"
+                                       icon="pi pi-info-circle"/>
+                        </p:commandButton>
+
+                        <p:commandButton icon="pi pi-pencil"
+                                         styleClass="rounded-button ui-button-outlined"
+                                         update="frmDialog:dlgEmpleadoId"
+                                         oncomplete="PF('dlgEmpleado').show()"
+                                         process="tblEmpleados"
+                                         action="#{empleadosBean.seleccionar(empleado)}"/>
+                    </h:panelGroup>
+                </p:column>
+
+                <p:column headerText="Fecha Registro">
+                    <h:outputLabel value="#{empleado.fechaRegistro}">
+                        <f:convertDateTime timeZone="#{parametrosApplication.timeZone}"
+                                           pattern="#{parametrosApplication.formatoFecha}"/>
+                    </h:outputLabel>
+                </p:column>
+
+                <p:column headerText="Cédula"
+                          sortBy="#{empleado.persona.cedula}"
+                          filterBy="#{empleado.persona.cedula}"
+                          filterMatchMode="contains"
+                          filterPlaceholder="Cédula">
+                    <h:outputText value="#{empleado.persona.cedula}"/>
+                </p:column>
+
+                <p:column headerText="Nombres"
+                          sortBy="#{empleado.persona.nombres}"
+                          filterBy="#{empleado.persona.nombres}"
+                          filterMatchMode="contains"
+                          filterPlaceholder="Nombres">
+                    <h:outputText value="#{empleado.persona.nombres}"/>
+                </p:column>
+
+                <p:column headerText="Apellidos"
+                          sortBy="#{empleado.persona.apellidos}"
+                          filterBy="#{empleado.persona.apellidos}"
+                          filterMatchMode="contains"
+                          filterPlaceholder="Apellidos">
+                    <h:outputText value="#{empleado.persona.apellidos}"/>
+                </p:column>
+
+                <p:column headerText="Email">
+                    <h:outputText value="#{empleado.persona.email}"/>
+                </p:column>
+
+                <p:column headerText="Teléfono">
+                    <h:outputText value="#{empleado.persona.telefono}"/>
+                </p:column>
+
+            </p:dataTable>
+        </p:panel>
+    </ui:define>
+    <ui:define name="dialog">
+        <p:dialog header="Empleado"
+                  id="dlgEmpleadoId"
+                  widgetVar="dlgEmpleado"
+                  minHeight="40"
+                  width="45%"
+                  showEffect="fade"
+                  modal="true"
+                  closeOnEscape="true">
+
+            <h:panelGrid columns="2"
+                         id="pnlDatosEmpleado"
+                         width="100%"
+                         columnClasses="topAligned,topAligned">
+                <h:panelGrid columns="2"
+                             width="90%">
+                    <p:outputLabel value="Cédula"
+                                   for="txtCedula"
+                                   styleClass="texto_negrita"/>
+                    <p:inputText value="#{empleadosBean.empleado.persona.cedula}"
+                                 required="true"
+                                 id="txtCedula"
+                                 maxlength="10"
+                                 styleClass="full-width"
+                                 validatorMessage="Formato de ruc incorrecto."
+                                 requiredMessage="Cédula: Campo obligatorio.">
+                        <p:keyFilter regEx="/[\d\-]/" preventPaste="false"/>
+                        <f:validator validatorId="validarCedulaRuc"/>
+                        <p:ajax event="change"
+                                listener="#{empleadosBean.verificarCedulaSistema()}"
+                                process="@this"
+                                update="pnlDatosEmpleado"/>
+                    </p:inputText>
+
+                    <p:outputLabel value="Nombres"
+                                   for="txtNombre"
+                                   styleClass="texto_negrita"/>
+                    <p:inputText value="#{empleadosBean.empleado.persona.nombres}"
+                                 required="true"
+                                 id="txtNombre"
+                                 maxlength="255"
+                                 styleClass="full-width"
+                                 requiredMessage="Nombres: Campo obligatorio."/>
+
+                    <p:outputLabel value="Apellidos"
+                                   for="txtApellidos"
+                                   styleClass="texto_negrita"/>
+                    <p:inputText value="#{empleadosBean.empleado.persona.apellidos}"
+                                 required="true"
+                                 id="txtApellidos"
+                                 maxlength="255"
+                                 styleClass="full-width"
+                                 requiredMessage="Apellidos: Campo obligatorio."/>
+
+                    <p:outputLabel value="Email"
+                                   for="txtEmail"
+                                   styleClass="texto_negrita"/>
+                    <p:inputText value="#{empleadosBean.empleado.persona.email}"
+                                 maxlength="50"
+                                 id="txtEmail"
+                                 styleClass="full-width"
+                                 validatorMessage="Formato de correo incorrecto.">
+                        <f:validator validatorId="validarEmail"/>
+                    </p:inputText>
+
+                    <p:outputLabel value="Teléfono"
+                                   for="txtTelefono"
+                                   styleClass="texto_negrita"/>
+                    <p:inputText value="#{empleadosBean.empleado.persona.telefono}"
+                                 maxlength="10"
+                                 id="txtTelefono"
+                                 styleClass="full-width">
+                        <p:keyFilter regEx="/[\d]/"/>
+                    </p:inputText>
+                </h:panelGrid>
+                <h:panelGrid columns="1"
+                             width="50%">
+
+                    <p:dataTable var="rolTableSlc"
+                                 value="#{empleadosBean.rolesSistemaLst}"
+                                 selection="#{empleadosBean.rolesSistemaLstSlc}"
+                                 rowKey="#{rolTableSlc.idRol}"
+                                 style="margin-bottom:0">
+
+                        <p:column selectionBox="true"
+                                  width="5%"
+                                  style="text-align:center"/>
+
+                        <p:column headerText="Rol">
+                            <h:outputText value="#{rolTableSlc.nombre}" />
+                        </p:column>
+                    </p:dataTable>
+                </h:panelGrid>
+            </h:panelGrid>
+            <br/>
+            <h:panelGrid columns="3" style="margin: 0 auto;">
+                <p:commandButton value="Guardar"
+                                 actionListener="#{empleadosBean.guardar}"
+                                 icon="pi pi-save"
+                                 process="@this,pnlDatosEmpleado"
+                                 update="pnlDatosEmpleado, formulario:tblEmpleados, formulario:grMensajes"/>
+                <p:spacer width="5"/>
+                <p:commandButton value="Cancelar"
+                                 icon="pi pi-times"
+                                 process="@this"
+                                 update="@form"
+                                 oncomplete="PF('dlgEmpleado').hide()"/>
+            </h:panelGrid>
+        </p:dialog>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="primefaces">
+
+<h:head>
+    <title>Login</title>
+    <meta content='text/html; charset=UTF-8' http-equiv="Content-Type"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="mobile-web-app-capable" content="yes"/>
+    <h:outputStylesheet library="assets" name="css/primeflex.css"/>
+    <h:outputStylesheet library="assets" name="css/primeicons.css"/>
+    <h:outputStylesheet library="assets" name="css/stylle.css"/>
+    <style>
+        /* Ajusta márgenes y padding */
+        .flex.align-items-center.justify-content-center .surface-card .text-center {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .flex.align-items-center.justify-content-center .surface-card .text-center img {
+            display: block !important;
+            margin: 0 auto !important;
+        }
+
+        .flex.align-items-center.justify-content-center .surface-card {
+            padding-top: 0.5rem !important;
+            padding-bottom: 0.5rem !important;
+        }
+
+        /* Agregar espacio debajo del botón de login */
+        .flex.align-items-center.justify-content-center .surface-card .w-full {
+            margin-bottom: 1rem !important;
+        }
+    </style>
+</h:head>
+
+<h:body>
+    <div class="flex align-items-center justify-content-center min-h-screen">
+        <div class="surface-card p-8 shadow-2 border-round w-full lg:w-3 md:w-7">
+            <div class="text-center mb-5">
+                <br/><br/>
+                <img src="/assets/image/logoLogin.png"
+                     alt="Logo"
+                     style="width: 200px; height: 100px; vertical-align: middle; margin: 0;" />
+                <br/><br/>
+                <div class="text-900 text-3xl font-medium mb-3">Bienvenidos</div>
+            </div>
+
+            <div>
+                <h:form prependId="false">
+                    <label for="nombreUsuario" class="block text-900 font-medium mb-2">Usuario</label>
+                    <p:inputText id="nombreUsuario" styleClass="w-full mb-3" placeholder="Usuario" />
+                    <label for="clave" class="block text-900 font-medium mb-2">Clave</label>
+                    <p:password id="clave" styleClass="w-full mb-3" placeholder="Clave" />
+
+                    <p:commandButton id="submit" value="Login" ajax="false"
+                                     icon="pi pi-user" styleClass="w-full" />
+                    <br/><br/>
+                </h:form>
+            </div>
+        </div>
+    </div>
+</h:body>
+</html>

@@ -1,0 +1,334 @@
+<ui:composition
+        xmlns:h="jakarta.faces.html"
+        xmlns:f="jakarta.faces.core"
+        xmlns:ui="jakarta.faces.facelets"
+        xmlns:p="http://primefaces.org/ui"
+        template="../templates/templateMenu.xhtml">
+
+    <ui:define name="titulo">
+        Terminales de Servicio
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="ADMINISTRACIÓN DE TERMINALES"
+                 styleClass="custom-panel">
+
+            <p:dataTable var="terminal"
+                         paginator="true"
+                         rows="10"
+                         id="tblTerminales"
+                         value="#{terminalesBean.listTerminales}"
+                         rowKey="#{terminal.idTerminal}"
+                         rowIndexVar="index">
+
+                <p:column style="width:2rem">
+                    <p:rowToggler/>
+                </p:column>
+
+                <f:facet name="header">
+                    <p:commandButton value="Nuevo"
+                                     update="frmDialog:dlgTerminalId"
+                                     icon="pi pi-external-link"
+                                     actionListener="#{terminalesBean.nuevo()}"
+                                     oncomplete="PF('dlgTerminal').show()"/>
+                </f:facet>
+
+                <p:column headerText="Opciones"
+                          width="5%">
+                    <h:panelGroup styleClass="botonera-opciones">
+                        <p:commandButton icon="pi pi-trash"
+                                         actionListener="#{terminalesBean.eliminar(index)}"
+                                         styleClass="rounded-button ui-button-outlined"
+                                         update="tblTerminales, formulario:grMensajes">
+                            <p:confirm header="Contirmación"
+                                       message="Desea eliminar el registro?"
+                                       icon="pi pi-info-circle"/>
+                        </p:commandButton>
+
+                        <p:commandButton icon="pi pi-pencil"
+                                         styleClass="rounded-button ui-button-outlined"
+                                         update="frmDialog:dlgTerminalId"
+                                         oncomplete="PF('dlgTerminal').show()"
+                                         process="tblTerminales"
+                                         action="#{terminalesBean.seleccionar(terminal)}"/>
+                    </h:panelGroup>
+                </p:column>
+
+                <p:column headerText="Código"
+                          sortBy="#{terminal.codigo}"
+                          filterBy="#{terminal.codigo}"
+                          filterMatchMode="contains"
+                          filterPlaceholder="Código"
+                          width="5%">
+                    <h:outputText value="#{terminal.codigo}"/>
+                </p:column>
+
+                <p:column headerText="Terminal"
+                          sortBy="#{terminal.nombre}"
+                          filterBy="#{terminal.nombre}"
+                          filterMatchMode="contains"
+                          filterPlaceholder="Nombre">
+                    <h:outputText value="#{terminal.nombre}"/>
+                </p:column>
+
+                <p:column headerText="Responsable">
+                    <h:outputText value="#{terminal.responsable.persona.nombres} #{terminal.responsable.persona.apellidos}"/>
+                </p:column>
+
+                <p:column headerText="Provincia"
+                          sortBy="#{terminal.parroquia.canton.provincia.descripcion}">
+                    <h:outputText value="#{terminal.parroquia.canton.provincia.descripcion}"/>
+                </p:column>
+
+                <p:column headerText="Cantón"
+                          sortBy="#{terminal.parroquia.canton.descripcion}">
+                    <h:outputText value="#{terminal.parroquia.canton.descripcion}"/>
+                </p:column>
+
+                <p:column headerText="Parroquia"
+                          sortBy="#{terminal.parroquia.descripcion}">
+                    <h:outputText value="#{terminal.parroquia.descripcion}"/>
+                </p:column>
+
+                <p:column headerText="Estado"
+                          width="4%">
+                    <h:outputText value="ACTIVO" rendered="#{terminal.estado}"/>
+                    <h:outputText value="INACTIVO" rendered="#{!terminal.estado}"/>
+                </p:column>
+
+                <p:rowExpansion>
+                    <p:dataTable var="estacion"
+                                 id="tblEstaciones"
+                                 value="#{terminal.estacionServicioList}"
+                                 emptyMessage="No hay Estaciones de Servicio registradas.">
+
+                        <f:facet name="header">
+                            <p:commandButton icon="pi pi-search"
+                                             value="Agregar"
+                                             action="#{terminalesBean.chooseEstacionServicio(terminal)}">
+                                <p:ajax event="dialogReturn"
+                                        listener="#{terminalesBean.onEstacionServicioChosen}"
+                                        update="formulario:grMensajes, tblEstaciones"/>
+                            </p:commandButton>
+                        </f:facet>
+
+                        <p:column headerText="Ruc">
+                            <h:outputText value="#{estacion.ruc}"/>
+                        </p:column>
+
+                        <p:column headerText="Código">
+                            <h:outputText value="#{estacion.codigo}"/>
+                        </p:column>
+
+                        <p:column headerText="Estacion de Servicio">
+                            <h:outputText value="#{estacion.nombre}"/>
+                        </p:column>
+
+                        <p:column headerText="Responsable">
+                            <h:outputText value="#{estacion.responsable.persona.nombreApellido}"/>
+                        </p:column>
+
+                        <p:column headerText="Provincia">
+                            <h:outputText value="#{estacion.parroquia.canton.provincia.descripcion}"/>
+                        </p:column>
+
+                        <p:column headerText="Cantón">
+                            <h:outputText value="#{estacion.parroquia.canton.descripcion}"/>
+                        </p:column>
+
+                        <p:column headerText="Parroquia">
+                            <h:outputText value="#{estacion.parroquia.descripcion}"/>
+                        </p:column>
+                    </p:dataTable>
+                </p:rowExpansion>
+
+            </p:dataTable>
+        </p:panel>
+    </ui:define>
+    <ui:define name="dialog">
+        <p:dialog header="Terminal"
+                  id="dlgTerminalId"
+                  widgetVar="dlgTerminal"
+                  minHeight="40"
+                  width="65%"
+                  showEffect="fade"
+                  modal="true"
+                  closeOnEscape="true">
+
+            <h:panelGrid columns="2"
+                         id="pnlDatosTerminal"
+                         width="90%"
+                         styleClass="topAligned,topAligned">
+                <h:panelGrid columns="2">
+                    <p:outputLabel value="Código"
+                                   for="txtCodigo"
+                                   styleClass="texto_negrita"/>
+                    <p:inputText value="#{terminalesBean.terminal.codigo}"
+                                 required="true"
+                                 maxlength="4"
+                                 styleClass="full-width"
+                                 id="txtCodigo"
+                                 requiredMessage="Código: Campo obligatorio."/>
+
+                    <p:outputLabel value="Nombre"
+                                   for="txtNombre"
+                                   styleClass="texto_negrita"/>
+                    <p:inputText value="#{terminalesBean.terminal.nombre}"
+                                 required="true"
+                                 maxlength="250"
+                                 styleClass="full-width"
+                                 id="txtNombre"
+                                 requiredMessage="Nombre: Campo obligatorio."/>
+
+                    <p:outputLabel value="Descripción"
+                                   for="txtDescripcion"
+                                   styleClass="texto_negrita"/>
+                    <p:inputTextarea value="#{terminalesBean.terminal.descripción}"
+                                     required="true"
+                                     maxlength="250"
+                                     styleClass="full-width"
+                                     id="txtDescripcion"
+                                     requiredMessage="Descripción: Campo obligatorio."/>
+
+                    <p:outputLabel value="Email"
+                                   for="txtEmail"
+                                   styleClass="texto_negrita"/>
+                    <p:inputText value="#{terminalesBean.terminal.email}"
+                                 maxlength="50"
+                                 id="txtEmail"
+                                 styleClass="full-width"
+                                 validatorMessage="Formato de correo incorrecto.">
+                        <f:validator validatorId="validarEmail"/>
+                    </p:inputText>
+
+                    <p:outputLabel value="Teléfono"
+                                   for="txtTelefono"
+                                   styleClass="texto_negrita"/>
+                    <p:inputText value="#{terminalesBean.terminal.telefono}"
+                                 maxlength="10"
+                                 id="txtTelefono"
+                                 styleClass="full-width">
+                        <p:keyFilter regEx="/[\d]/"/>
+                    </p:inputText>
+
+                    <p:outputLabel value="Provincia:"
+                                   for="cmbProvincia"
+                                   styleClass="texto_negrita"/>
+                    <p:selectOneMenu id="cmbProvincia"
+                                     styleClass="full-width"
+                                     value="#{terminalesBean.provincia}"
+                                     required="true"
+                                     requiredMessage="Provincia: Campo obligatorio."
+                                     filter="true" filterMatchMode="startsWith"
+                                     converter="omnifaces.SelectItemsConverter">
+                        <f:selectItem itemLabel="--Seleccione--"
+                                      noSelectionOption="true"/>
+                        <f:selectItems value="#{terminalesBean.listaProvincias}"
+                                       var="prov"
+                                       itemLabel="#{prov.descripcion}"
+                                       itemValue="#{prov}" />
+                        <p:ajax event="change"
+                                listener="#{terminalesBean.actualizarProvincia}"
+                                update="cmbCanton, cmbParroquia"/>
+                    </p:selectOneMenu>
+
+                    <p:outputLabel value="Cantón:"
+                                   for="cmbCanton"
+                                   styleClass="texto_negrita"/>
+                    <p:selectOneMenu id="cmbCanton"
+                                     styleClass="full-width"
+                                     required="true"
+                                     requiredMessage="Cantón: Campo obligatorio."
+                                     filter="true" filterMatchMode="startsWith"
+                                     value="#{terminalesBean.canton}"
+                                     converter="omnifaces.SelectItemsConverter">
+                        <f:selectItem itemLabel="--Seleccione--" itemValue=""
+                                      noSelectionOption="true"/>
+                        <f:selectItems value="#{terminalesBean.listaCantones}"
+                                       var="can"
+                                       itemLabel="#{can.descripcion}"
+                                       itemValue="#{can}"/>
+                        <p:ajax event="change" listener="#{terminalesBean.actualizarCanton}"
+                                update="cmbParroquia"/>
+                    </p:selectOneMenu>
+
+                    <p:outputLabel value="Parroquia:"
+                                   for="cmbParroquia"
+                                   styleClass="texto_negrita"/>
+                    <p:selectOneMenu id="cmbParroquia"
+                                     styleClass="full-width"
+                                     filter="true" filterMatchMode="startsWith"
+                                     required="true"
+                                     requiredMessage="Parroquia: Campo obligatorio."
+                                     value="#{terminalesBean.terminal.parroquia}"
+                                     converter="omnifaces.SelectItemsConverter">
+                        <f:selectItem itemLabel="--Seleccione--"
+                                      itemValue="" noSelectionOption="true"/>
+                        <f:selectItems value="#{terminalesBean.listaParroquias}"
+                                       var="parr"
+                                       itemLabel="#{parr.descripcion}"
+                                       itemValue="#{parr}"/>
+                    </p:selectOneMenu>
+
+                    <p:outputLabel value="Responsable:"
+                                   styleClass="texto_negrita"/>
+                    <h:panelGrid columns="2" id="pnlResponsable">
+                        <p:commandButton icon="pi pi-search"
+                                         action="#{terminalesBean.chooseEmpleado}">
+                            <p:ajax event="dialogReturn"
+                                    listener="#{terminalesBean.onEmpleadoChosen}"
+                                    update="formulario:grMensajes, txtResponsable"/>
+                        </p:commandButton>
+                        <p:outputLabel value="#{terminalesBean.terminal.responsable.persona.nombres} #{terminalesBean.terminal.responsable.persona.apellidos}"
+                                       id="txtResponsable"/>
+                    </h:panelGrid>
+                </h:panelGrid>
+                <h:panelGrid columns="1">
+                    <p:outputLabel value="Estado"
+                                   styleClass="texto_negrita"/>
+                    <p:selectBooleanButton onLabel="Activo"
+                                           offLabel="Inactivo"
+                                           onIcon="pi pi-check"
+                                           offIcon="pi pi-times"
+                                           value="#{terminalesBean.terminal.estado}"/>
+
+                    <p:outputLabel value="Tipo de Combustible"
+                                   styleClass="texto_negrita"/>
+                    <p:dataTable var="tipoC"
+                                 value="#{terminalesBean.tiposCombustiblesSource}"
+                                 selection="#{terminalesBean.tiposCombustiblesTarget}"
+                                 rowKey="#{tipoC.idTipoCombustible}"
+                                 style="margin-bottom:0">
+
+                        <p:column selectionBox="true"
+                                  width="5%"
+                                  style="text-align:center"/>
+
+                        <p:column headerText="Producto">
+                            <h:outputText value="#{tipoC.nombre}" />
+                        </p:column>
+
+                        <p:column headerText="Tipo">
+                            <h:outputText value="Automotriz" rendered="#{tipoC.tipo eq 1}"/>
+                            <h:outputText value="Industrial" rendered="#{tipoC.tipo eq 2}"/>
+                        </p:column>
+                    </p:dataTable>
+                </h:panelGrid>
+            </h:panelGrid>
+            <br/>
+            <h:panelGrid columns="3" style="margin: 0 auto">
+                <p:commandButton value="Guardar"
+                                 actionListener="#{terminalesBean.guardar}"
+                                 icon="pi pi-save"
+                                 process="@this,pnlDatosTerminal"
+                                 update="pnlDatosTerminal, formulario:tblTerminales, formulario:grMensajes"/>
+                <p:spacer width="5"/>
+                <p:commandButton value="Cancelar"
+                                 icon="pi pi-times"
+                                 process="@this"
+                                 update="@form"
+                                 oncomplete="PF('dlgTerminal').hide()"/>
+            </h:panelGrid>
+        </p:dialog>
+    </ui:define>
+</ui:composition>

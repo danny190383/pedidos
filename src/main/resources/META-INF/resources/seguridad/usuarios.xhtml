@@ -1,0 +1,63 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="jakarta.faces.html"
+        xmlns:ui="jakarta.faces.facelets"
+        template="../templates/templateMenu.xhtml"
+        xmlns:p="primefaces">
+
+    <ui:define name="titulo">
+        USUARIOS
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="ADMINISTRACIÓN DE USUARIOS"
+                 styleClass="custom-panel">
+            <p:dataTable var="usuario"
+                         paginator="true"
+                         rows="10"
+                         id="tblUsuarios"
+                         value="#{usuarioBean.listUsuarios}">
+
+                <p:column headerText="Clave"
+                          width="4%">
+                    <p:commandButton icon="pi pi-refresh"
+                                     actionListener="#{usuarioBean.resetClave(usuario)}"
+                                     styleClass="rounded-button ui-button-outlined"
+                                     update="tblUsuarios, grMensajes">
+                        <p:confirm header="Contirmación"
+                                   message="Desea reiniciar la contraseña?"
+                                   icon="pi pi-info-circle"/>
+                    </p:commandButton>
+                </p:column>
+
+                <p:column headerText="Estado"
+                          width="7%">
+                    <p:commandButton icon="pi pi-refresh"
+                                     actionListener="#{usuarioBean.cambiarEstado(usuario)}"
+                                     styleClass="rounded-button ui-button-outlined"
+                                     update="tblUsuarios, grMensajes">
+                        <p:confirm header="Contirmación"
+                                   message="Desea cambiar el estado?"
+                                   icon="pi pi-info-circle"/>
+                    </p:commandButton>
+                    <p:spacer width="5px"/>
+                    <h:outputText value="ACTIVO" rendered="#{usuario.estado}"/>
+                    <h:outputText value="INACTIVO" rendered="#{!usuario.estado}"/>
+                </p:column>
+
+                <p:column headerText="Nombre Usuario"
+                          sortBy="#{usuario.username}"
+                          filterBy="#{usuario.username}"
+                          filterMatchMode="contains"
+                          filterPlaceholder="Nombre Usuario">
+                    <h:outputText value="#{usuario.username}"/>
+                </p:column>
+
+                <p:column headerText="Empleado">
+                    <h:outputText value="#{usuario.empleado.persona.nombreApellido}"/>
+                </p:column>
+
+            </p:dataTable>
+        </p:panel>
+    </ui:define>
+</ui:composition>

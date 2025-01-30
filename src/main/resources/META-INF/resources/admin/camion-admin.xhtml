@@ -1,0 +1,275 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="jakarta.faces.html"
+        xmlns:ui="jakarta.faces.facelets"
+        xmlns:f="http://java.sun.com/jsf/core"
+        template="../templates/templateMenu.xhtml"
+        xmlns:p="primefaces">
+
+    <ui:define name="titulo">
+        Camiones
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="ADMINISTRACIÓN DE CAMIONES"
+                 styleClass="custom-panel">
+            <p:dataTable var="camion"
+                         paginator="true"
+                         rows="10"
+                         id="tblCamion"
+                         value="#{camionBean.listCamion}"
+                         rowIndexVar="index">
+
+                <f:facet name="header">
+                    <p:commandButton value="Nuevo"
+                                     update="frmDialog:dlgCamionId"
+                                     icon="pi pi-external-link"
+                                     actionListener="#{camionBean.nuevo}"
+                                     oncomplete="PF('dlgCamion').show()"/>
+                </f:facet>
+
+                <p:column headerText="Opciones"
+                          width="5%">
+                    <h:panelGroup styleClass="botonera-opciones">
+                        <p:commandButton icon="pi pi-trash"
+                                         actionListener="#{camionBean.eliminar(index)}"
+                                         styleClass="rounded-button ui-button-outlined"
+                                         update="tblCamion, formulario:grMensajes">
+                            <p:confirm header="Contirmación"
+                                       message="Desea eliminar el registro?"
+                                       icon="pi pi-info-circle"/>
+                        </p:commandButton>
+
+                        <p:commandButton icon="pi pi-pencil"
+                                         styleClass="rounded-button ui-button-outlined"
+                                         update="frmDialog:dlgCamionId"
+                                         oncomplete="PF('dlgCamion').show()"
+                                         process="tblCamion"
+                                         action="#{camionBean.seleccionar(camion)}"/>
+                    </h:panelGroup>
+                </p:column>
+
+                <p:column headerText="Código"
+                          field="codigo"
+                          sortBy="#{camion.codigo}"
+                          filterBy="#{camion.codigo}"
+                          filterPlaceholder="Código"
+                          width="15%">
+                    <h:outputText value="#{camion.codigo}"/>
+                </p:column>
+
+                <p:column headerText="Placa"
+                          field="placa"
+                          sortBy="#{camion.placa}"
+                          filterBy="#{camion.placa}"
+                          filterPlaceholder="Placa"
+                          width="15%">
+                    <h:outputText value="#{camion.placa}"/>
+                </p:column>
+
+                <p:column headerText="Capacidad"
+                          width="10%">
+                    <h:outputText value="#{camion.capacidad}"/>
+                </p:column>
+
+                <p:column headerText="Compartimientos"
+                          width="10%">
+                    <h:outputText value="#{camion.compartimientos} "/>
+                </p:column>
+
+                <p:column headerText="Transportista">
+                    <h:outputText value="#{camion.persona.nombres} #{camion.persona.apellidos}"/>
+                </p:column>
+
+                <p:column headerText="Estado"
+                          width="4%">
+                    <h:outputText value="ACTIVO" rendered="#{camion.estado}"/>
+                    <h:outputText value="INACTIVO" rendered="#{!camion.estado}"/>
+                </p:column>
+
+            </p:dataTable>
+        </p:panel>
+    </ui:define>
+    <ui:define name="dialog">
+        <p:dialog header="Camión"
+                  id="dlgCamionId"
+                  widgetVar="dlgCamion"
+                  minHeight="40"
+                  width="30%"
+                  showEffect="fade"
+                  modal="true"
+                  closeOnEscape="true">
+
+            <h:panelGrid columns="2"
+                         id="pnlDatosCamion"
+                         width="90%">
+                <p:outputLabel value="Código"
+                               for="txtCodigo"
+                               styleClass="texto_negrita"/>
+                <p:inputText value="#{camionBean.camion.codigo}"
+                             required="true"
+                             maxlength="20"
+                             styleClass="full-width"
+                             id="txtCodigo"
+                             requiredMessage="Código: Campo obligatorio."/>
+
+                <p:outputLabel value="Placa"
+                               for="txtPlaca"
+                               styleClass="texto_negrita"/>
+                <p:inputText value="#{camionBean.camion.placa}"
+                             required="true"
+                             maxlength="20"
+                             styleClass="full-width"
+                             id="txtPlaca"
+                             requiredMessage="Placa: Campo obligatorio."/>
+
+                <p:outputLabel value="Capacidad Volumen"
+                               for="txtCapacidad"
+                               styleClass="texto_negrita"/>
+                <p:inputNumber value="#{camionBean.camion.capacidad}"
+                               required="true"
+                               styleClass="full-width"
+                               id="txtCapacidad"
+                               decimalPlaces="2"
+                               requiredMessage="Capacidad Volumen: Campo obligatorio."/>
+
+                <p:outputLabel value="Compartimientos"
+                               for="txtCompartimientos"
+                               styleClass="texto_negrita"/>
+                <p:inputNumber value="#{camionBean.camion.compartimientos}"
+                               required="true"
+                               styleClass="full-width"
+                               id="txtCompartimientos"
+                               decimalPlaces="0"
+                               requiredMessage="Compartimientos: Campo obligatorio."/>
+
+                <p:outputLabel value="Transportista"
+                               styleClass="texto_negrita"/>
+                <h:panelGrid columns="3" id="pnlTransportista">
+                    <p:commandButton update="frmDialog:dlgEmpleadoId"
+                                     icon="pi pi-external-link"
+                                     actionListener="#{camionBean.nuevoPersona()}"
+                                     oncomplete="PF('dlgEmpleado').show()"/>
+
+                    <p:commandButton icon="pi pi-search"
+                                     process="@this"
+                                     action="#{camionBean.choosePersona}">
+                        <p:ajax event="dialogReturn"
+                                listener="#{camionBean.onPersonaChosen}"
+                                update="formulario:grMensajes, txtTransportista"/>
+                    </p:commandButton>
+
+                    <p:outputLabel value="#{camionBean.camion.persona.nombres} #{camionBean.camion.persona.apellidos}"
+                                   id="txtTransportista"/>
+                </h:panelGrid>
+
+                <p:outputLabel value="Estado"
+                               styleClass="texto_negrita"/>
+                <p:selectBooleanButton onLabel="Activo"
+                                       offLabel="Inactivo"
+                                       onIcon="pi pi-check"
+                                       offIcon="pi pi-times"
+                                       value="#{camionBean.camion.estado}"/>
+            </h:panelGrid>
+            <br/>
+            <h:panelGrid columns="3" style="margin: 0 auto">
+                <p:commandButton value="Guardar"
+                                 actionListener="#{camionBean.guardar}"
+                                 icon="pi pi-save"
+                                 process="@this,pnlDatosCamion"
+                                 update="pnlDatosCamion, formulario:tblCamion, formulario:grMensajes"/>
+                <p:spacer width="5"/>
+                <p:commandButton value="Cancelar"
+                                 icon="pi pi-times"
+                                 process="@this"
+                                 update="@form"
+                                 oncomplete="PF('dlgCamion').hide()"/>
+            </h:panelGrid>
+        </p:dialog>
+        <p:dialog header="Transportista"
+                  id="dlgEmpleadoId"
+                  widgetVar="dlgEmpleado"
+                  minHeight="40"
+                  width="45%"
+                  showEffect="fade"
+                  modal="true"
+                  closeOnEscape="true">
+
+            <h:panelGrid columns="2"
+                         width="100%"
+                         id="pnlDatosEmpleado">
+                <p:outputLabel value="Cédula"
+                               for="txtCedula"
+                               styleClass="texto_negrita"/>
+                <p:inputText value="#{camionBean.persona.cedula}"
+                             required="true"
+                             id="txtCedula"
+                             maxlength="10"
+                             styleClass="full-width"
+                             validatorMessage="Formato de cédula incorrecto."
+                             requiredMessage="Cédula: Campo obligatorio.">
+                    <p:keyFilter regEx="/[\d\-]/" preventPaste="false"/>
+                    <f:validator validatorId="validarCedulaRuc"/>
+                    <p:ajax event="change"
+                            listener="#{camionBean.verificarCedulaSistema()}"
+                            process="@this"
+                            update="pnlDatosEmpleado"/>
+                </p:inputText>
+
+                <p:outputLabel value="Nombres"
+                               for="txtNombre"
+                               styleClass="texto_negrita"/>
+                <p:inputText value="#{camionBean.persona.nombres}"
+                             required="true"
+                             id="txtNombre"
+                             maxlength="255"
+                             styleClass="full-width"
+                             requiredMessage="Nombres: Campo obligatorio."/>
+
+                <p:outputLabel value="Apellidos"
+                               for="txtApellidos"
+                               styleClass="texto_negrita"/>
+                <p:inputText value="#{camionBean.persona.apellidos}"
+                             required="true"
+                             id="txtApellidos"
+                             maxlength="255"
+                             styleClass="full-width"
+                             requiredMessage="Apellidos: Campo obligatorio."/>
+
+                <p:outputLabel value="Email"
+                               for="txtEmail"
+                               styleClass="texto_negrita"/>
+                <p:inputText value="#{camionBean.persona.email}"
+                             maxlength="50"
+                             id="txtEmail"
+                             styleClass="full-width"
+                             validatorMessage="Formato de correo incorrecto.">
+                    <f:validator validatorId="validarEmail"/>
+                </p:inputText>
+
+                <p:outputLabel value="Teléfono"
+                               for="txtTelefono"
+                               styleClass="texto_negrita"/>
+                <p:inputText value="#{camionBean.persona.telefono}"
+                             maxlength="10"
+                             id="txtTelefono"
+                             styleClass="full-width">
+                    <p:keyFilter regEx="/[\d]/"/>
+                </p:inputText>
+            </h:panelGrid>
+            <br/>
+            <h:panelGrid columns="3" style="margin: 0 auto;">
+                <p:commandButton value="Guardar"
+                                 actionListener="#{camionBean.guardarPersona}"
+                                 icon="pi pi-save"
+                                 process="@this,pnlDatosEmpleado"
+                                 update="pnlDatosEmpleado, frmDialog:pnlDatosCamion, formulario:grMensajes"/>
+                <p:spacer width="5"/>
+                <p:commandButton value="Cancelar"
+                                 icon="pi pi-times"
+                                 process="@this"
+                                 oncomplete="PF('dlgEmpleado').hide()"/>
+            </h:panelGrid>
+        </p:dialog>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,115 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="jakarta.faces.html"
+        xmlns:ui="jakarta.faces.facelets"
+        xmlns:f="http://java.sun.com/jsf/core"
+        template="../templates/templateMenu.xhtml"
+        xmlns:p="primefaces">
+
+    <ui:define name="titulo">
+        Razón Anulación
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="MANTENIMIENTO RAZÓN DE ANULACIÓN"
+                 styleClass="custom-panel">
+            <p:dataTable var="razonA"
+                         paginator="true"
+                         rows="10"
+                         id="tblRazonAnulacion"
+                         value="#{razonAnulacionBean.listRazonAnulacion}"
+                         rowIndexVar="index">
+
+                <f:facet name="header">
+                    <p:commandButton value="Nuevo"
+                                     update="frmDialog:dlgRazonAnulacionId"
+                                     icon="pi pi-external-link"
+                                     actionListener="#{razonAnulacionBean.nuevo}"
+                                     oncomplete="PF('dlgRazonAnulacion').show()"/>
+                </f:facet>
+
+                <p:column headerText="Opciones"
+                          width="5%">
+                    <h:panelGroup styleClass="botonera-opciones">
+                        <p:commandButton icon="pi pi-trash"
+                                         actionListener="#{razonAnulacionBean.eliminar(index)}"
+                                         styleClass="rounded-button ui-button-outlined"
+                                         update="tblRazonAnulacion, formulario:grMensajes">
+                            <p:confirm header="Contirmación"
+                                       message="Desea eliminar el registro?"
+                                       icon="pi pi-info-circle"/>
+                        </p:commandButton>
+
+                        <p:commandButton icon="pi pi-pencil"
+                                         styleClass="rounded-button ui-button-outlined"
+                                         update="frmDialog:dlgRazonAnulacionId"
+                                         oncomplete="PF('dlgRazonAnulacion').show()"
+                                         process="tblRazonAnulacion"
+                                         action="#{razonAnulacionBean.seleccionar(razonA)}"/>
+                    </h:panelGroup>
+                </p:column>
+
+                <p:column headerText="Nombre"
+                          sortBy="#{razonA.nombre}"
+                          filterBy="#{razonA.nombre}"
+                          filterMatchMode="contains"
+                          filterPlaceholder="Nombre">
+                    <h:outputText value="#{razonA.nombre}"/>
+                </p:column>
+
+                <p:column headerText="Estado"
+                          width="4%">
+                    <h:outputText value="ACTIVO" rendered="#{razonA.estado}"/>
+                    <h:outputText value="INACTIVO" rendered="#{!razonA.estado}"/>
+                </p:column>
+
+            </p:dataTable>
+        </p:panel>
+    </ui:define>
+    <ui:define name="dialog">
+        <p:dialog header="Razón Anulación"
+                  id="dlgRazonAnulacionId"
+                  widgetVar="dlgRazonAnulacion"
+                  minHeight="40"
+                  width="20%"
+                  showEffect="fade"
+                  modal="true"
+                  closeOnEscape="true">
+
+            <h:panelGrid columns="2"
+                         id="pnlDatosRazonAnulacion"
+                         width="90%">
+                <p:outputLabel value="Nombre"
+                               for="txtNombre"
+                               styleClass="texto_negrita"/>
+                <p:inputText value="#{razonAnulacionBean.razonAnulacion.nombre}"
+                             required="true"
+                             maxlength="20"
+                             styleClass="full-width"
+                             id="txtNombre"
+                             requiredMessage="Nombre: Campo obligatorio."/>
+
+                <p:outputLabel value="Estado" />
+                <p:selectBooleanButton onLabel="Activo"
+                                       offLabel="Inactivo"
+                                       onIcon="pi pi-check"
+                                       offIcon="pi pi-times"
+                                       value="#{razonAnulacionBean.razonAnulacion.estado}"/>
+            </h:panelGrid>
+            <br/>
+            <h:panelGrid columns="3" style="margin: 0 auto">
+                <p:commandButton value="Guardar"
+                                 actionListener="#{razonAnulacionBean.guardar}"
+                                 icon="pi pi-save"
+                                 process="@this,pnlDatosRazonAnulacion"
+                                 update="pnlDatosRazonAnulacion, formulario:tblRazonAnulacion, formulario:grMensajes"/>
+                <p:spacer width="5"/>
+                <p:commandButton value="Cancelar"
+                                 icon="pi pi-times"
+                                 process="@this"
+                                 update="@form"
+                                 oncomplete="PF('dlgRazonAnulacion').hide()"/>
+            </h:panelGrid>
+        </p:dialog>
+    </ui:define>
+</ui:composition>

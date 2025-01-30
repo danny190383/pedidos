@@ -1,0 +1,107 @@
+.ui-widget {
+    font-size: 11px;
+}
+
+html {
+    font-size: 11px; 
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    overflow-x: hidden;
+    overflow-y: auto;
+    background: linear-gradient(to bottom, #ffffff, #e5f2fc, #c6dff0, #a3cde4);
+    background-repeat: no-repeat; /* Evita que el degradado se repita */
+    background-attachment: fixed; /* Fija el degradado al viewport */
+    background-size: cover;
+    font-family: Arial, sans-serif;
+    font-weight: normal;
+    color: var(--text-color);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.texto_negrita{
+    font-style: normal;
+    font-weight: bold;
+}
+
+.full-width {
+    width: 100% !important;
+    box-sizing: border-box;
+}
+
+.botonera-opciones {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.topAligned {
+    vertical-align: top !important;
+    width: 50% !important;
+}
+
+body .ui-menu {
+    background: none !important;
+    border: none !important;
+}
+
+body .ui-menu .ui-menu-list .ui-menuitem .ui-menuitem-link .ui-menuitem-icon {
+    font-size: 20px !important;
+}
+
+.ui-menu {
+    border: none;
+    background: transparent;
+}
+
+.ui-menu .ui-menuitem {
+    margin-right: 20px;
+}
+
+.custom-panel {
+    background-color: transparent !important; /* Hace el fondo transparente */
+    box-shadow: none !important; /* Elimina las sombras */
+    border: none !important; /* Elimina los bordes */
+}
+
+/* Cuerpo del panel */
+.custom-panel .ui-panel-content {
+    background-color: transparent !important; /* Fondo transparente para el contenido */
+    border: none  !important; /* Elimina bordes internos */
+}
+
+/* Bordes adicionales del componente panel */
+.custom-panel .ui-widget-content {
+    border: none  !important; /* Elimina cualquier borde general del widget */
+}
+
+/* Si hay bordes visibles en el contenedor general */
+.custom-panel .ui-panel {
+    border: none; /* Asegura que no haya bordes en el panel contenedor */
+}
+
+.ui-linkbutton.ui-button.ui-state-default > a {
+    text-decoration: none !important;
+}
+
+.custom-panel .ui-panel-title {
+    font-size: 1.2rem; /* Ajusta el tamaño según tu preferencia */
+    font-weight: bold; /* Opcional: para hacerlo más grueso */
+}
+
+.label-column {
+    width: 30%; /* Ancho fijo para etiquetas */
+    text-align: left;
+    padding-right: 10px;
+}
+
+.input-column {
+    width: 70%; /* El campo ocupa el resto del espacio */
+}

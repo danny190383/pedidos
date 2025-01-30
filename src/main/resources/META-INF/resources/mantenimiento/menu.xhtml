@@ -1,0 +1,124 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="jakarta.faces.html"
+        xmlns:ui="jakarta.faces.facelets"
+        xmlns:f="http://java.sun.com/jsf/core"
+        template="../templates/templateMenu.xhtml"
+        xmlns:p="primefaces">
+
+    <ui:define name="titulo">
+        Menu
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="MANTENIMIENTO DE RUTAS"
+                 styleClass="custom-panel">
+            <p:toolbar>
+                <p:toolbarGroup>
+                    <p:commandButton value="Guardar"
+                                     disabled="#{menuBean.ruta.idRuta eq null}"
+                                     actionListener="#{menuBean.guardar}"
+                                     icon="pi pi-save"
+                                     process="@form"
+                                     update="@form,formulario:grMensajes"/>
+
+                    <p:commandButton icon="pi pi-trash"
+                                     value="Eliminar"
+                                     rendered="false"
+                                     actionListener="#{menuBean.eliminar}"
+                                     update="formulario:grMensajes">
+                        <p:confirm header="Contirmación"
+                                   message="Desea eliminar el registro?"
+                                   icon="pi pi-info-circle"/>
+                    </p:commandButton>
+                </p:toolbarGroup>
+            </p:toolbar>
+            <br/>
+            <h:panelGrid columns="3"
+                         columnClasses="topAligned,topAligned,topAligned">
+                <p:fieldset id="flsMenu0001"
+                            style="height:550px"
+                            legend="Menu">
+                    <p:tree value="#{menuBean.root}"
+                            var="node"
+                            id="menuTree"
+                            dynamic="true"
+                            selectionMode="single">
+
+                        <p:ajax event="select"
+                                update="formulario"
+                                listener="#{menuBean.onNodeSelect}" />
+
+                        <p:treeNode expandedIcon="pi-pi-folder-open"
+                                    collapsedIcon="pi-pi-folder">
+                            <h:outputLabel value="#{node.nombre}" />
+                        </p:treeNode>
+
+                    </p:tree>
+                </p:fieldset>
+                <p:fieldset id="flsMenu0002"
+                            legend="Opciones"
+                            style="height:550px">
+                    <h:panelGrid columns="2">
+                        <p:outputLabel value="Nombre"
+                                       for="txtNombre"
+                                       styleClass="texto_negrita"/>
+                        <p:inputText value="#{menuBean.ruta.nombre}"
+                                     required="true"
+                                     maxlength="20"
+                                     styleClass="full-width"
+                                     id="txtNombre"
+                                     requiredMessage="Nombre: Campo obligatorio."/>
+
+                        <p:outputLabel value="Url"
+                                       for="txtUrl"
+                                       styleClass="texto_negrita"/>
+                        <p:inputText value="#{menuBean.ruta.rutaUrl}"
+                                     required="true"
+                                     maxlength="50"
+                                     styleClass="full-width"
+                                     id="txtUrl"
+                                     requiredMessage="Url: Campo obligatorio."/>
+
+                        <p:outputLabel value="Icono"
+                                       for="txtIcono"
+                                       styleClass="texto_negrita"/>
+                        <p:inputText value="#{menuBean.ruta.icon}"
+                                     maxlength="20"
+                                     styleClass="full-width"
+                                     id="txtIcono"/>
+
+                        <p:outputLabel value="Orden"
+                                       for="txtOrden"
+                                       styleClass="texto_negrita"/>
+                        <p:inputNumber value="#{menuBean.ruta.orden}"
+                                       decimalPlaces="0"
+                                       styleClass="full-width"
+                                       id="txtOrden"/>
+                    </h:panelGrid>
+                </p:fieldset>
+                <p:fieldset id="flsMenu0003"
+                            legend="Roles del Sistema"
+                            style="height:550px">
+                    <h:panelGrid columns="1">
+                        <p:pickList value="#{menuBean.rolesSistema}"
+                                    var="tipoC"
+                                    disabled="#{menuBean.ruta.idRuta eq null ||
+                                                 menuBean.ruta.padre eq null }"
+                                    id="pkListCombustible"
+                                    itemLabel="#{tipoC.nombre}"
+                                    itemValue="#{tipoC}"
+                                    transferOnCheckboxClick="true"
+                                    showCheckbox="true"
+                                    showSourceControls="false"
+                                    showTargetControls="false"
+                                    converter="rolConverter">
+                            <f:facet name="sourceCaption">Disponible</f:facet>
+                            <f:facet name="targetCaption">Asignado</f:facet>
+                        </p:pickList>
+                    </h:panelGrid>
+                </p:fieldset>
+            </h:panelGrid>
+        </p:panel>
+    </ui:define>
+</ui:composition>

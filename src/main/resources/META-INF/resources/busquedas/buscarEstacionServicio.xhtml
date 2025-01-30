@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:h="jakarta.faces.html"
+      xmlns:p="primefaces">
+
+    <h:head>
+        <title>Busqueda Estaciones</title>
+        <h:outputStylesheet library="assets" name="css/primeflex.css"/>
+        <h:outputStylesheet library="assets" name="css/primeicons.css"/>
+        <h:outputStylesheet library="assets" name="css/stylle.css"/>
+    </h:head>
+
+    <h:body style="font-family: var(--font-family);">
+        <h:form>
+	        <p:dataTable var="estacion"
+	                     paginator="true"
+	                     rows="5"
+	                     id="tblEstacionServicio"
+	                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+	                     value="#{buscarEstacionServicioBean.lazyModel}">
+	
+	            <p:column width="5%">
+					<p:commandButton icon="pi pi-check"
+									 actionListener="#{buscarEstacionServicioBean.selectEstacionServicioServiceFromDialog(estacion)}"/>
+	            </p:column>
+
+				<p:column headerText="Ruc"
+						  field="ruc"
+						  filterBy="#{estacion.ruc}"
+						  sortBy="#{estacion.ruc}"
+						  filterPlaceholder="Ruc">
+					<h:outputText value="#{estacion.ruc}"/>
+				</p:column>
+
+				<p:column headerText="Código"
+						  field="codigo"
+						  filterBy="#{estacion.codigo}"
+						  sortBy="#{estacion.codigo}"
+						  filterPlaceholder="Código">
+					<h:outputText value="#{estacion.codigo}"/>
+				</p:column>
+	
+	            <p:column headerText="Estación de Servicio"
+						  field="nombre"
+	                      filterBy="#{estacion.nombre}"
+	                      sortBy="#{estacion.nombre}"
+	                      filterPlaceholder="Estación de Servicio">
+	                <h:outputText value="#{estacion.nombre}"/>
+	            </p:column>
+	
+	        </p:dataTable>
+        </h:form>
+    </h:body>
+</html>

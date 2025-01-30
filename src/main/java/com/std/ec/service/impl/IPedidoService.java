@@ -1,0 +1,21 @@
+package com.std.ec.service.impl;
+
+import com.std.ec.entity.Pedido;
+import org.primefaces.model.FilterMeta;
+import org.primefaces.model.SortMeta;
+
+import java.util.List;
+import java.util.Map;
+
+public interface IPedidoService {
+
+    List<Pedido> listar();
+
+    Integer obtenerSiguienteCodigo();
+
+    void guardarPedido(Pedido pedido);
+
+    List<Pedido> getPedidos(int first, int pageSize, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy);
+
+    long countPedidos(Map<String, FilterMeta> filterBy);
+}

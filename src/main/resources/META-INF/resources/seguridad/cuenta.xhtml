@@ -1,0 +1,84 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="jakarta.faces.facelets"
+        xmlns:h="http://java.sun.com/jsf/html"
+        template="../templates/templateMenu.xhtml"
+        xmlns:p="primefaces"
+        xmlns:f="http://java.sun.com/jsf/core">
+
+    <ui:define name="titulo">
+        Mis Datos
+    </ui:define>
+
+    <ui:define name="content">
+
+        <p:panel header="MIS DATOS"
+                 styleClass="custom-panel">
+            <h:panelGrid columns="1">
+                <p:commandButton value="Guardar"
+                                 actionListener="#{loginBean.guardar()}"
+                                 icon="pi pi-save"
+                                 process="@this,pnlDatosUsuario"
+                                 update="pnlDatosUsuario, formulario:grMensajes"/>
+            </h:panelGrid>
+            <h:panelGrid columns="2"
+                         id="pnlDatosUsuario"
+                         width="25%">
+
+                <p:outputLabel value="Cédula"
+                               styleClass="texto_negrita"/>
+                <p:outputLabel value="#{loginBean.usuario.empleado.persona.cedula}"
+                               styleClass="texto_negrita"/>
+
+                <p:outputLabel value="Nombres"
+                               for="txtNombre"
+                               styleClass="texto_negrita"/>
+                <p:inputText value="#{loginBean.usuario.empleado.persona.nombres}"
+                             required="true"
+                             maxlength="20"
+                             styleClass="full-width"
+                             id="txtNombre"
+                             requiredMessage="Nombre: Campo obligatorio."/>
+
+                <p:outputLabel value="Apellidos"
+                               for="txtApellidos"
+                               styleClass="texto_negrita"/>
+                <p:inputText value="#{loginBean.usuario.empleado.persona.apellidos}"
+                             required="true"
+                             maxlength="20"
+                             styleClass="full-width"
+                             id="txtApellidos"
+                             requiredMessage="Apellidos: Campo obligatorio."/>
+
+                <p:outputLabel value="Email"
+                               for="txtEmail"
+                               styleClass="texto_negrita"/>
+                <p:inputText value="#{loginBean.usuario.empleado.persona.email}"
+                             maxlength="50"
+                             id="txtEmail"
+                             styleClass="full-width"
+                             validatorMessage="Formato de correo incorrecto.">
+                    <f:validator validatorId="validarEmail"/>
+                </p:inputText>
+
+                <p:outputLabel value="Teléfono"
+                               for="txtTelefono"
+                               styleClass="texto_negrita"/>
+                <p:inputText value="#{loginBean.usuario.empleado.persona.telefono}"
+                             maxlength="10"
+                             id="txtTelefono"
+                             styleClass="full-width">
+                    <p:keyFilter regEx="/[\d]/"/>
+                </p:inputText>
+
+                <p:outputLabel value="Clave"
+                               for="txtClave"
+                               styleClass="texto_negrita"/>
+                <p:password id="txtClave"
+                            value="#{loginBean.usuario.passwordTmp}"
+                            toggleMask="true"
+                            redisplay="true"/>
+            </h:panelGrid>
+        </p:panel>
+    </ui:define>
+</ui:composition>

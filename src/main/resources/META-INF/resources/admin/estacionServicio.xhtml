@@ -1,0 +1,289 @@
+<ui:composition
+        xmlns:h="jakarta.faces.html"
+        xmlns:f="jakarta.faces.core"
+        xmlns:ui="jakarta.faces.facelets"
+        xmlns:p="http://primefaces.org/ui"
+        template="../templates/templateMenu.xhtml">
+
+    <ui:define name="titulo">
+        Estaciones de Servicio
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="ADMINISTRACIÓN ESTACIONES DE SERVICIO"
+                 styleClass="custom-panel">
+
+            <p:commandButton value="Buscar Empleado" 
+                             icon="pi pi-home" 
+                             rendered="false" 
+                             action="#{estacionServicioBean.chooseEmpleado}">
+                <p:ajax event="dialogReturn"
+                        listener="#{estacionServicioBean.onEmpleadoChosen}"
+                        update="formulario:grMensajes"/>
+            </p:commandButton>
+
+            <p:dataTable var="estacionS"
+                         paginator="true"
+                         rows="10" 
+                         id="tblEstacionServicio"
+                         value="#{estacionServicioBean.listEstacionServicios}"
+                         rowIndexVar="index">
+
+                <f:facet name="header">
+                    <p:commandButton value="Nuevo"
+                                     update="frmDialog:dlgEstacionServicioId"
+                                     icon="pi pi-external-link"
+                                     actionListener="#{estacionServicioBean.nuevo()}"
+                                     oncomplete="PF('dlgEstacionServicio').show()"/>
+                </f:facet>
+
+                <p:column headerText="Opciones"
+                          width="5%">
+                    <h:panelGroup styleClass="botonera-opciones">
+                        <p:commandButton icon="pi pi-trash"
+                                         actionListener="#{estacionServicioBean.eliminar(index)}"
+                                         styleClass="rounded-button ui-button-outlined"
+                                         update="tblEstacionServicio, formulario:grMensajes">
+                            <p:confirm header="Contirmación"
+                                       message="Desea eliminar el registro?"
+                                       icon="pi pi-info-circle"/>
+                        </p:commandButton>
+
+                        <p:commandButton icon="pi pi-pencil"
+                                         styleClass="rounded-button ui-button-outlined"
+                                         update="frmDialog:dlgEstacionServicioId"
+                                         oncomplete="PF('dlgEstacionServicio').show()"
+                                         process="tblEstacionServicio"
+                                         action="#{estacionServicioBean.seleccionar(estacionS)}"/>
+                    </h:panelGroup>
+                </p:column>
+
+                <p:column headerText="Código"
+                          sortBy="#{estacionS.codigo}"
+                          filterBy="#{estacionS.codigo}"
+                          filterMatchMode="contains"
+                          filterPlaceholder="Código"
+                          width="5%">
+                    <h:outputText value="#{estacionS.codigo}"/>
+                </p:column>
+
+                <p:column headerText="Ruc"
+                          sortBy="#{estacionS.ruc}"
+                          filterBy="#{estacionS.ruc}"
+                          filterMatchMode="contains"
+                          filterPlaceholder="Ruc"
+                          width="8%">
+                    <h:outputText value="#{estacionS.ruc}"/>
+                </p:column>
+
+                <p:column headerText="Estación de Servicio"
+                          sortBy="#{estacionS.nombre}"
+                          filterBy="#{estacionS.nombre}"
+                          filterMatchMode="contains"
+                          filterPlaceholder="Nombre">
+                    <h:outputText value="#{estacionS.nombre}"/>
+                </p:column>
+
+                <p:column headerText="Responsable">
+                    <h:outputText value="#{estacionS.responsable.persona.nombres} #{estacionS.responsable.persona.apellidos}"/>
+                </p:column>
+
+                <p:column headerText="Provincia"
+                          sortBy="#{estacionS.parroquia.canton.provincia.descripcion}">
+                    <h:outputText value="#{estacionS.parroquia.canton.provincia.descripcion}"/>
+                </p:column>
+
+                <p:column headerText="Cantón"
+                          sortBy="#{estacionS.parroquia.canton.descripcion}">
+                    <h:outputText value="#{estacionS.parroquia.canton.descripcion}"/>
+                </p:column>
+
+                <p:column headerText="Parroquia"
+                          sortBy="#{estacionS.parroquia.descripcion}">
+                    <h:outputText value="#{estacionS.parroquia.descripcion}"/>
+                </p:column>
+
+                <p:column headerText="Estado"
+                          width="4%">
+                    <h:outputText value="ACTIVO" rendered="#{estacionS.estado}"/>
+                    <h:outputText value="INACTIVO" rendered="#{!estacionS.estado}"/>
+                </p:column>
+
+            </p:dataTable>
+        </p:panel>
+    </ui:define>
+    <ui:define name="dialog">
+        <p:dialog header="Estación de Servicio"
+                  id="dlgEstacionServicioId"
+                  widgetVar="dlgEstacionServicio"
+                  minHeight="40"
+                  width="35%"
+                  showEffect="fade"
+                  modal="true"
+                  closeOnEscape="true">
+
+            <h:panelGrid columns="2"
+                         id="pnlDatosEstacionServicio"
+                         width="90%">
+                <p:outputLabel value="Código"
+                               for="txtCodigo"
+                               styleClass="texto_negrita"/>
+                <p:inputText value="#{estacionServicioBean.estacionServicio.codigo}"
+                             required="true"
+                             maxlength="4"
+                             styleClass="full-width"
+                             id="txtCodigo"
+                             requiredMessage="Código: Campo obligatorio."/>
+
+                <p:outputLabel value="Ruc"
+                               for="txtRuc"
+                               styleClass="texto_negrita"/>
+                <p:inputText value="#{estacionServicioBean.estacionServicio.ruc}"
+                             required="true"
+                             id="txtRuc"
+                             maxlength="13"
+                             styleClass="full-width"
+                             validatorMessage="Formato de ruc incorrecto."
+                             requiredMessage="Ruc: Campo obligatorio.">
+                    <p:keyFilter regEx="/[\d\-]/" preventPaste="false"/>
+                    <f:validator validatorId="validarCedulaRuc"/>
+                </p:inputText>
+
+                <p:outputLabel value="Nombre"
+                               for="txtNombre"
+                               styleClass="texto_negrita"/>
+                <p:inputText value="#{estacionServicioBean.estacionServicio.nombre}"
+                             required="true"
+                             maxlength="250"
+                             styleClass="full-width"
+                             id="txtNombre"
+                             requiredMessage="Nombre: Campo obligatorio."/>
+
+                <p:outputLabel value="Descripción"
+                               for="txtDescripcion"
+                               styleClass="texto_negrita"/>
+                <p:inputTextarea value="#{estacionServicioBean.estacionServicio.descripción}"
+                                 required="true"
+                                 maxlength="250"
+                                 styleClass="full-width"
+                                 id="txtDescripcion"
+                                 requiredMessage="Descripción: Campo obligatorio."/>
+
+                <p:outputLabel value="Email"
+                               for="txtEmail"
+                               styleClass="texto_negrita"/>
+                <p:inputText value="#{estacionServicioBean.estacionServicio.email}"
+                             maxlength="50"
+                             id="txtEmail"
+                             styleClass="full-width"
+                             validatorMessage="Formato de correo incorrecto.">
+                    <f:validator validatorId="validarEmail"/>
+                </p:inputText>
+
+                <p:outputLabel value="Teléfono"
+                               for="txtTelefono"
+                               styleClass="texto_negrita"/>
+                <p:inputText value="#{estacionServicioBean.estacionServicio.telefono}"
+                             maxlength="10"
+                             id="txtTelefono"
+                             styleClass="full-width">
+                    <p:keyFilter regEx="/[\d]/"/>
+                </p:inputText>
+
+                <p:outputLabel value="Provincia:"
+                               for="cmbProvincia"
+                               styleClass="texto_negrita"/>
+                <p:selectOneMenu id="cmbProvincia"
+                                 styleClass="full-width"
+                                 value="#{estacionServicioBean.provincia}"
+                                 required="true"
+                                 requiredMessage="Provincia: Campo obligatorio."
+                                 filter="true" filterMatchMode="startsWith"
+                                 converter="omnifaces.SelectItemsConverter">
+                    <f:selectItem itemLabel="--Seleccione--"
+                                  noSelectionOption="true"/>
+                    <f:selectItems value="#{estacionServicioBean.listaProvincias}"
+                                   var="prov"
+                                   itemLabel="#{prov.descripcion}"
+                                   itemValue="#{prov}" />
+                    <p:ajax event="change"
+                            listener="#{estacionServicioBean.actualizarProvincia}"
+                            update="cmbCanton, cmbParroquia"/>
+                </p:selectOneMenu>
+
+                <p:outputLabel value="Cantón:"
+                               for="cmbCanton"
+                               styleClass="texto_negrita"/>
+                <p:selectOneMenu id="cmbCanton"
+                                 styleClass="full-width"
+                                 required="true"
+                                 requiredMessage="Cantón: Campo obligatorio."
+                                 filter="true" filterMatchMode="startsWith"
+                                 value="#{estacionServicioBean.canton}"
+                                 converter="omnifaces.SelectItemsConverter">
+                    <f:selectItem itemLabel="--Seleccione--" itemValue=""
+                                  noSelectionOption="true"/>
+                    <f:selectItems value="#{estacionServicioBean.listaCantones}"
+                                   var="can"
+                                   itemLabel="#{can.descripcion}"
+                                   itemValue="#{can}"/>
+                    <p:ajax event="change" listener="#{estacionServicioBean.actualizarCanton}"
+                            update="cmbParroquia"/>
+                </p:selectOneMenu>
+
+                <p:outputLabel value="Parroquia:"
+                               for="cmbParroquia"
+                               styleClass="texto_negrita"/>
+                <p:selectOneMenu id="cmbParroquia"
+                                 styleClass="full-width"
+                                 filter="true" filterMatchMode="startsWith"
+                                 required="true"
+                                 requiredMessage="Parroquia: Campo obligatorio."
+                                 value="#{estacionServicioBean.estacionServicio.parroquia}"
+                                 converter="omnifaces.SelectItemsConverter">
+                    <f:selectItem itemLabel="--Seleccione--"
+                                  itemValue="" noSelectionOption="true"/>
+                    <f:selectItems value="#{estacionServicioBean.listaParroquias}"
+                                   var="parr"
+                                   itemLabel="#{parr.descripcion}"
+                                   itemValue="#{parr}"/>
+                </p:selectOneMenu>
+
+                <p:outputLabel value="Responsable:"
+                               styleClass="texto_negrita"/>
+                <h:panelGrid columns="2" id="pnlResponsable">
+                    <p:commandButton icon="pi pi-search"
+                                     action="#{estacionServicioBean.chooseEmpleado}">
+                        <p:ajax event="dialogReturn"
+                                listener="#{estacionServicioBean.onEmpleadoChosen}"
+                                update="formulario:grMensajes, txtResponsable"/>
+                    </p:commandButton>
+                    <p:outputLabel value="#{estacionServicioBean.estacionServicio.responsable.persona.nombres} #{estacionServicioBean.estacionServicio.responsable.persona.apellidos}"
+                                   id="txtResponsable"/>
+                </h:panelGrid>
+
+                <p:outputLabel value="Estado"
+                               styleClass="texto_negrita"/>
+                <p:selectBooleanButton onLabel="Activo"
+                                       offLabel="Inactivo"
+                                       onIcon="pi pi-check"
+                                       offIcon="pi pi-times"
+                                       value="#{estacionServicioBean.estacionServicio.estado}"/>
+            </h:panelGrid>
+            <br/>
+            <h:panelGrid columns="3" style="margin: 0 auto">
+                <p:commandButton value="Guardar"
+                                 actionListener="#{estacionServicioBean.guardar}"
+                                 icon="pi pi-save"
+                                 process="@this,pnlDatosEstacionServicio"
+                                 update="pnlDatosEstacionServicio, formulario:tblEstacionServicio, formulario:grMensajes"/>
+                <p:spacer width="5"/>
+                <p:commandButton value="Cancelar"
+                                 icon="pi pi-times"
+                                 process="@this"
+                                 update="@form"
+                                 oncomplete="PF('dlgEstacionServicio').hide()"/>
+            </h:panelGrid>
+        </p:dialog>
+    </ui:define>
+</ui:composition>

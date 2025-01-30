@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:sec="https://joinfaces.org/security"
+      xmlns:p="primefaces"
+      xmlns:pe="primefaces.extensions"
+>
+<h:head>
+    <title><ui:insert name="titulo"/></title>
+    <meta content='text/html; charset=UTF-8' http-equiv="Content-Type"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="mobile-web-app-capable" content="yes"/>
+    <h:outputStylesheet library="assets" name="css/primeflex.css"/>
+    <h:outputStylesheet library="assets" name="css/primeicons.css"/>
+    <h:outputStylesheet library="assets" name="css/stylle.css"/>
+</h:head>
+<h:body >
+    <pe:layout fullPage="true">
+        <pe:layoutPane id="layoutPane" position="center">
+            <h:form id="form">
+                <div class="ui-fluid center">
+                    <p:menubar>
+                        <p:menuitem value="Inicio" outcome="/home.xhtml"/>
+                        <p:menuitem value="Menu" outcome="/mantenimiento/menu.xhtml"/>
+                        <p:menuitem value="Roles" outcome="/mantenimiento/roles.xhtml"/>
+                        <p:menuitem value="Razón Anulación" outcome="/mantenimiento/razonAnulacion.xhtml"/>
+                        <p:menuitem value="Tipo Combustible" outcome="/mantenimiento/tipoCombustible.xhtml"/>
+                        <sec:authorize access="hasRole('ROLE_ADMIN')">
+                            <p:menuitem value="Empleados" outcome="/admin/empleado-admin.xhtml"
+                                        rendered="#{sec:isAuthenticated()}"/>
+                            <p:menuitem value="Terminales" outcome="/admin/terminales.xhtml"
+                                        rendered="#{sec:isAuthenticated()}"/>
+                            <p:menuitem value="Estación de Servicio" outcome="/admin/estacionServicio.xhtml"
+                                        rendered="#{sec:isAuthenticated()}"/>
+                        </sec:authorize>
+                        <p:menuitem value="Cerrar Sesión" url="/logout"/>
+                    </p:menubar>
+                </div>
+            </h:form>
+            <div class="px-4 py-5 md:px-6 lg:px-8">
+                <div class="flex align-items-center justify-content-center">
+                    <section class="surface-section px-4 py-5 md:px-6 lg:px-8 w-full">
+                        <div class="flex flex-column lg:flex-row gap-3 justify-content-between lg:align-items-center border-primary py-5"
+                             style="border-top: 7px solid">
+                            <div class="flex flex-column gap-2">
+
+                                <p class="mb-0 mt-0 text-base text-600">
+                                    <h:form id="formulario">
+                                        <p:growl id="grMensajes"
+                                                 widgetVar="grMensajes"
+                                                 showDetail="false"
+                                                 class="grow"/>
+                                        <ui:insert name="nombrePagina"/>
+                                        <p:confirmDialog global="true"
+                                                         showEffect="fade"
+                                                         hideEffect="fade"
+                                                         responsive="true"
+                                                         width="350">
+                                            <p:commandButton value="No"
+                                                             type="button"
+                                                             styleClass="ui-confirmdialog-no ui-button-flat"/>
+                                            <p:commandButton value="Yes"
+                                                             type="button"
+                                                             styleClass="ui-confirmdialog-yes" />
+                                        </p:confirmDialog>
+                                    </h:form>
+                                </p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </pe:layoutPane>
+    </pe:layout>
+    <h:form id="frmDialog">
+        <ui:insert name="dialog"/>
+    </h:form>
+</h:body>
+</html>

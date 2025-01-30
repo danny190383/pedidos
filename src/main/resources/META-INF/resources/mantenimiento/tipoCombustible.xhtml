@@ -1,0 +1,180 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="jakarta.faces.html"
+        xmlns:ui="jakarta.faces.facelets"
+        xmlns:f="http://java.sun.com/jsf/core"
+        template="../templates/templateMenu.xhtml"
+        xmlns:p="primefaces">
+
+    <ui:define name="titulo">
+        Tipos de Combustible
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="MANTENIMIENTO TIPOS DE COMBUSTIBLE"
+                 styleClass="custom-panel">
+            <p:dataTable var="tipoC"
+                         paginator="true"
+                         rows="10"
+                         id="tblTipoCombustible"
+                         value="#{tipoCombustibleBean.listTipoCombustibles}"
+                         rowIndexVar="index"
+                         rowKey="#{tipoC.idTipoCombustible}">
+
+                <p:column style="width:2rem">
+                    <p:rowToggler/>
+                </p:column>
+
+                <f:facet name="header">
+                    <p:commandButton value="Nuevo"
+                                     update="frmDialog:dlgTipoCombustibleId"
+                                     icon="pi pi-external-link"
+                                     actionListener="#{tipoCombustibleBean.nuevo}"
+                                     oncomplete="PF('dlgTipoCombustible').show()"/>
+                </f:facet>
+
+                <p:column headerText="Opciones"
+                          width="5%">
+                    <h:panelGroup styleClass="botonera-opciones">
+                        <p:commandButton icon="pi pi-trash"
+                                         actionListener="#{tipoCombustibleBean.eliminar(index)}"
+                                         styleClass="rounded-button ui-button-outlined"
+                                         update="tblTipoCombustible, formulario:grMensajes">
+                            <p:confirm header="Contirmación"
+                                       message="Desea eliminar el registro?"
+                                       icon="pi pi-info-circle"/>
+                        </p:commandButton>
+
+                        <p:commandButton icon="pi pi-pencil"
+                                         styleClass="rounded-button ui-button-outlined"
+                                         update="frmDialog:dlgTipoCombustibleId"
+                                         oncomplete="PF('dlgTipoCombustible').show()"
+                                         process="tblTipoCombustible"
+                                         action="#{tipoCombustibleBean.seleccionar(tipoC)}"/>
+                    </h:panelGroup>
+                </p:column>
+
+                <p:column headerText="Tipo Combustible"
+                          sortBy="#{tipoC.nombre}"
+                          filterBy="#{tipoC.nombre}"
+                          filterMatchMode="contains"
+                          filterPlaceholder="Nombre">
+                    <h:outputText value="#{tipoC.nombre}"/>
+                </p:column>
+
+                <p:column headerText="Tipo"
+                          sortBy="#{tipoC.tipo}"
+                          width="20%">
+                    <h:outputText value="Automotriz" rendered="#{tipoC.tipo eq 1}"/>
+                    <h:outputText value="Industrial" rendered="#{tipoC.tipo eq 2}"/>
+                </p:column>
+
+                <p:column headerText="Estado"
+                          width="4%">
+                    <h:outputText value="ACTIVO" rendered="#{tipoC.estado}"/>
+                    <h:outputText value="INACTIVO" rendered="#{!tipoC.estado}"/>
+                </p:column>
+
+                <p:rowExpansion>
+                    <p:dataTable var="costo"
+                                 id="tblCostos"
+                                 value="#{tipoC.tipoCombustibleCostoOrderLst}"
+                                 emptyMessage="No hay costos registrados.">
+
+                        <f:facet name="header">
+                            <p:inputNumber value="#{tipoCombustibleBean.costo}"
+                                           decimalPlaces="2"
+                                           placeholder="Costo Ingresar"/>
+                            <p:spacer width="10px"/>
+                            <p:commandButton value="Agregar"
+                                             process="formulario:tblTipoCombustible"
+                                             update="tblCostos, formulario:grMensajes"
+                                             icon="pi pi-external-link"
+                                             actionListener="#{tipoCombustibleBean.agregarCosto(tipoC)}"/>
+                        </f:facet>
+
+                        <p:column headerText="Fecha Registro">
+                            <h:outputText value="#{costo.fechaRegistro}">
+                                <f:convertDateTime timeZone="#{parametrosApplication.timeZone}"
+                                                   pattern="#{parametrosApplication.formatoFechaHoraSMS}"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Usuario Registra">
+                            <h:outputText value="#{costo.usuarioRegistra.empleado.persona.nombreApellido}"/>
+                        </p:column>
+
+                        <p:column headerText="Costo">
+                            <h:outputText value="#{costo.costo}"/>
+                        </p:column>
+
+                        <p:column headerText="Estado"
+                                  width="4%">
+                            <h:outputText value="ACTIVO" rendered="#{costo.estado}"/>
+                            <h:outputText value="INACTIVO" rendered="#{!costo.estado}"/>
+                        </p:column>
+                    </p:dataTable>
+                </p:rowExpansion>
+
+            </p:dataTable>
+        </p:panel>
+    </ui:define>
+    <ui:define name="dialog">
+        <p:dialog header="Tipo de Combustible"
+                  id="dlgTipoCombustibleId"
+                  widgetVar="dlgTipoCombustible"
+                  minHeight="40"
+                  width="20%"
+                  showEffect="fade"
+                  modal="true"
+                  closeOnEscape="true">
+
+            <h:panelGrid columns="2"
+                         id="pnlDatosTipoCombustible"
+                         width="90%">
+                <p:outputLabel value="Nombre"
+                               for="txtNombre"
+                               styleClass="texto_negrita"/>
+                <p:inputText value="#{tipoCombustibleBean.tipoCombustible.nombre}"
+                             required="true"
+                             maxlength="20"
+                             styleClass="full-width"
+                             id="txtNombre"
+                             requiredMessage="Nombre: Campo obligatorio."/>
+
+                <p:outputLabel value="Tipo"
+                               for="slcTipo"
+                               styleClass="texto_negrita"/>
+                <p:selectOneMenu id="slcTipo"
+                                 required="true"
+                                 styleClass="full-width"
+                                 value="#{tipoCombustibleBean.tipoCombustible.tipo}">
+                    <f:selectItem itemLabel="-- Seleccionar --" itemValue=""/>
+                    <f:selectItem itemLabel="Automotriz" itemValue="1"/>
+                    <f:selectItem itemLabel="Industrial." itemValue="2"/>
+                </p:selectOneMenu>
+
+                <p:outputLabel value="Estado" />
+                <p:selectBooleanButton onLabel="Activo"
+                                       offLabel="Inactivo"
+                                       onIcon="pi pi-check"
+                                       offIcon="pi pi-times"
+                                       value="#{tipoCombustibleBean.tipoCombustible.estado}"/>
+            </h:panelGrid>
+            <br/>
+            <h:panelGrid columns="3" style="margin: 0 auto">
+                <p:commandButton value="Guardar"
+                                 actionListener="#{tipoCombustibleBean.guardar}"
+                                 icon="pi pi-save"
+                                 process="@this,pnlDatosTipoCombustible"
+                                 update="pnlDatosTipoCombustible, formulario:tblTipoCombustible, formulario:grMensajes"/>
+                <p:spacer width="5"/>
+                <p:commandButton value="Cancelar"
+                                 icon="pi pi-times"
+                                 process="@this"
+                                 update="@form"
+                                 oncomplete="PF('dlgTipoCombustible').hide()"/>
+            </h:panelGrid>
+        </p:dialog>
+    </ui:define>
+</ui:composition>

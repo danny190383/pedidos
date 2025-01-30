@@ -1,0 +1,47 @@
+/* Bordes para las tablas de PrimeFaces */
+.ui-datatable {
+    border: 1px solid #ccc; /* Color del borde exterior de la tabla */
+    border-collapse: collapse; /* Combinar bordes adyacentes */
+    background-color: #fff; /* Fondo blanco */
+}
+
+/* Bordes de las celdas */
+.ui-datatable th,
+.ui-datatable td {
+    border: 1px solid #ddd; /* Bordes de las celdas */
+    padding: 8px; /* Espaciado interno */
+}
+
+/* Compactar filas */
+.ui-datatable tr {
+    height: 30px; /* Reduce la altura de las filas */
+}
+
+/* Fondo alterno para las filas */
+.ui-datatable tr:nth-child(even) {
+    background-color: #f9f9f9; /* Fondo claro para filas pares */
+}
+
+/* Hover sobre filas */
+.ui-datatable tr:hover {
+    background-color: #f1f1f1; /* Fondo claro al pasar el mouse */
+}
+
+/* Estilo de los encabezados */
+.ui-datatable th {
+    background-color: #007ad9; /* Color del encabezado */
+    color: white; /* Color del texto */
+    text-align: center; /* Centrar texto */
+    font-weight: bold; /* Negrita */
+}
+
+/* Reducir padding de los encabezados */
+.ui-datatable th {
+    padding: 6px 10px; /* Menos espacio interno */
+}
+
+/* Botones en las opciones (opcional, puedes personalizar) */
+.ui-button {
+    margin: 2px; /* Menos espacio entre botones */
+    padding: 4px 8px; /* Botones compactos */
+}

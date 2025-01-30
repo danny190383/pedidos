@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:h="jakarta.faces.html"
+      xmlns:p="primefaces"
+	  xmlns:f="http://java.sun.com/jsf/core">
+
+    <h:head>
+        <title>Busqueda de Pedidos</title>
+        <h:outputStylesheet library="assets" name="css/primeflex.css"/>
+        <h:outputStylesheet library="assets" name="css/primeicons.css"/>
+        <h:outputStylesheet library="assets" name="css/stylle.css"/>
+    </h:head>
+
+    <h:body style="font-family: var(--font-family);">
+        <h:form>
+	        <p:dataTable var="pedido"
+	                     paginator="true"
+	                     rows="5"
+	                     id="tblPedidos"
+	                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+	                     value="#{buscarPedidoBean.lazyModel}">
+	
+	            <p:column width="5%">
+					<p:commandButton icon="pi pi-check"
+									 actionListener="#{buscarPedidoBean.selectPersonaFromDialog(pedido)}"/>
+	            </p:column>
+
+				<p:column headerText="Fecha Registro">
+					<h:outputLabel value="#{pedido.fechaRegistro}">
+						<f:convertDateTime timeZone="#{parametrosApplication.timeZone}"
+										   pattern="#{parametrosApplication.formatoFechaHoraSMS}"/>
+					</h:outputLabel>
+				</p:column>
+	
+	            <p:column headerText="Código"
+						  field="codigo"
+	                      filterBy="#{pedido.codigo}"
+	                      sortBy="#{pedido.codigo}"
+	                      filterPlaceholder="Código">
+	                <h:outputText value="#{pedido.codigo}"/>
+	            </p:column>
+	
+	            <p:column headerText="Terminal"
+						  field="terminal.nombre"
+	                      filterBy="#{pedido.terminal.nombre}"
+	                      sortBy="#{pedido.terminal.nombre}"
+	                      filterPlaceholder="Nombres">
+	                <h:outputText value="#{pedido.terminal.nombre}"/>
+	            </p:column>
+	
+	            <p:column headerText="Estacion"
+						  field="estacionServicio.nombre"
+	                      filterBy="#{pedido.estacionServicio.nombre}"
+	                      sortBy="#{pedido.estacionServicio.nombre}"
+	                      filterPlaceholder="Apellidos">
+	                <h:outputText value="#{pedido.estacionServicio.nombre}"/>
+	            </p:column>
+	
+	            <p:column headerText="Total"
+						  style="text-align: right">
+	                <h:outputText value="#{pedido.total}"/>
+	            </p:column>
+	
+	        </p:dataTable>
+        </h:form>
+    </h:body>
+</html>

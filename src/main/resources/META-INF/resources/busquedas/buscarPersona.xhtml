@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:h="jakarta.faces.html"
+      xmlns:p="primefaces">
+
+    <h:head>
+        <title>Busqueda de Personas</title>
+        <h:outputStylesheet library="assets" name="css/primeflex.css"/>
+        <h:outputStylesheet library="assets" name="css/primeicons.css"/>
+        <h:outputStylesheet library="assets" name="css/stylle.css"/>
+    </h:head>
+
+    <h:body style="font-family: var(--font-family);">
+        <h:form>
+	        <p:dataTable var="persona"
+	                     paginator="true"
+	                     rows="5"
+	                     id="tblEmpleados"
+	                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+	                     value="#{buscarPersonaBean.lazyModel}">
+	
+	            <p:column width="5%">
+					<p:commandButton icon="pi pi-check"
+									 actionListener="#{buscarPersonaBean.selectPersonaFromDialog(persona)}"/>
+	            </p:column>
+	
+	            <p:column headerText="Cédula"
+						  field="cedula"
+	                      filterBy="#{persona.cedula}"
+	                      sortBy="#{persona.cedula}"
+	                      filterPlaceholder="Cédula">
+	                <h:outputText value="#{persona.cedula}"/>
+	            </p:column>
+	
+	            <p:column headerText="Nombres"
+						  field="nombres"
+	                      filterBy="#{persona.nombres}"
+	                      sortBy="#{persona.nombres}"
+	                      filterPlaceholder="Nombres">
+	                <h:outputText value="#{persona.nombres}"/>
+	            </p:column>
+	
+	            <p:column headerText="Apellidos"
+						  field="apellidos"
+	                      filterBy="#{persona.apellidos}"
+	                      sortBy="#{persona.apellidos}"
+	                      filterPlaceholder="Apellidos">
+	                <h:outputText value="#{persona.apellidos}"/>
+	            </p:column>
+	
+	            <p:column headerText="Teléfono">
+	                <h:outputText value="#{persona.telefono}"/>
+	            </p:column>
+	
+	        </p:dataTable>
+        </h:form>
+    </h:body>
+</html>

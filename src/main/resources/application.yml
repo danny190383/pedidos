@@ -1,0 +1,35 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/pedidosPS
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+  logging:
+    level:
+      org.hibernate.SQL: DEBUG
+      org.hibernate.tool.hbm2ddl: DEBUG
+  main:
+    web-application-type: servlet
+  faces:
+    facelets-skip-comments: true
+    project-stage: Development
+    exception-handler: org.omnifaces.exceptionhandler.FullStackExceptionHandler
+  jsf:
+    enabled: true
+  primefaces:
+    FONT_AWESOME: false
+  server:
+    servlet:
+      session:
+        cookie:
+          same-site: strict
+          secure: false
+  omnifaces:
+    resource-handler-cache: false
+  sql:
+    init:
+      mode: never

@@ -1,0 +1,208 @@
+<ui:composition
+        xmlns:h="jakarta.faces.html"
+        xmlns:f="jakarta.faces.core"
+        xmlns:ui="jakarta.faces.facelets"
+        xmlns:p="http://primefaces.org/ui"
+        template="../templates/templateMenu.xhtml">
+
+    <ui:define name="titulo">
+        Pedido
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="PEDIDO"
+                 styleClass="custom-panel">
+            <p:toolbar>
+                <p:toolbarGroup>
+                    <p:commandButton value="Nuevo"
+                                     actionListener="#{pedidoBean.nuevoPedido}"
+                                     icon="pi pi-plus"
+                                     process="@this"
+                                     update="@form,formulario:grMensajes"/>
+                    <p:spacer width="10px" />
+                    <p:commandButton value="Guardar"
+                                     actionListener="#{pedidoBean.guardar}"
+                                     icon="pi pi-save"
+                                     process="@form"
+                                     update="@form,formulario:grMensajes"/>
+                    <p:spacer width="10px" />
+                    <p:commandButton icon="pi pi-search"
+                                     value="Buscar Pedido"
+                                     process="@this"
+                                     action="#{pedidoBean.choosePedido}">
+                        <p:ajax event="dialogReturn"
+                                listener="#{pedidoBean.onPedidoChosen}"
+                                update="formulario:grMensajes, @form"/>
+                    </p:commandButton>
+                </p:toolbarGroup>
+            </p:toolbar>
+            <br/>
+            <h:panelGrid columns="2"
+                         width="60%"
+                         styleClass="topAligned,topAligned">
+                <p:fieldset id="flsMenu0001"
+                            style="height:150px"
+                            legend="Datos Generales">
+                    <h:panelGrid columns="2">
+                        <p:outputLabel value="CÓDIGO:"
+                                       styleClass="texto_negrita"/>
+                        <p:outputLabel value="#{pedidoBean.pedido.codigo}"
+                                       styleClass="texto_negrita"/>
+
+                        <p:outputLabel value="FECHA:"
+                                       styleClass="texto_negrita"/>
+                        <p:outputLabel value="#{pedidoBean.pedido.fechaRegistro}"
+                                       styleClass="texto_negrita">
+                            <f:convertDateTime timeZone="#{parametrosApplication.timeZone}"
+                                               pattern="#{parametrosApplication.formatoFechaHoraSMS}"/>
+                        </p:outputLabel>
+
+                        <p:outputLabel value="RESPONSABLE:"
+                                       styleClass="texto_negrita"/>
+                        <p:outputLabel value="#{pedidoBean.pedido.usuarioRegistra.empleado.persona.nombreApellido}"
+                                       styleClass="texto_negrita"/>
+
+                    </h:panelGrid>
+                </p:fieldset>
+                <p:fieldset id="flsMenu0002"
+                            style="height:150px"
+                            legend="Datos Pedido">
+                    <h:panelGrid columns="2"
+                                 style="width: 100%;" columnClasses="label-column, input-column">
+                        <p:outputLabel value="ESTACIÓN:"
+                                       styleClass="texto_negrita"/>
+                        <p:selectOneMenu styleClass="full-width"
+                                         id="slcEstacion"
+                                         style="width: 100%;"
+                                         disabled="#{pedidoBean.pedido.terminal.idTerminal ne null}"
+                                         value="#{pedidoBean.pedido.estacionServicio.idEstacionServicio}"
+                                         required="true"
+                                         requiredMessage="Estación: Campo obligatorio."
+                                         filter="true" filterMatchMode="startsWith">
+                            <f:selectItem itemLabel="--Seleccione--"
+                                          noSelectionOption="true"/>
+                            <f:selectItems value="#{pedidoBean.estacionServicioLst}"
+                                           var="estacion"
+                                           itemLabel="#{estacion.nombre}"
+                                           itemValue="#{estacion.idEstacionServicio}" />
+                            <p:ajax event="change"
+                                    process="@this"
+                                    listener="#{pedidoBean.seleccionarEstacionServicio}"
+                                    update="formulario:grMensajes, formulario:slcTerminal"/>
+                        </p:selectOneMenu>
+
+                        <p:outputLabel value="TERMINAL:"
+                                       styleClass="texto_negrita"/>
+                        <p:selectOneMenu styleClass="full-width"
+                                         id="slcTerminal"
+                                         style="width: 100%;"
+                                         disabled="#{pedidoBean.pedido.pedidoDetalleLst.size() > 0}"
+                                         value="#{pedidoBean.pedido.terminal.idTerminal}"
+                                         required="true"
+                                         requiredMessage="Terminal: Campo obligatorio."
+                                         filter="true" filterMatchMode="startsWith">
+                            <f:selectItem itemLabel="--Seleccione--"
+                                          noSelectionOption="true"/>
+                            <f:selectItems value="#{pedidoBean.pedido.estacionServicio.terminalList}"
+                                           var="terminal"
+                                           itemLabel="#{terminal.nombre}"
+                                           itemValue="#{terminal.idTerminal}" />
+                            <p:ajax event="change"
+                                    process="@this"
+                                    listener="#{pedidoBean.seleccionarTerminal}"
+                                    update="formulario:grMensajes, formulario:flsMenu0003, formulario:slcEstacion"/>
+                        </p:selectOneMenu>
+
+                        <p:outputLabel value="TOTAL PEDIDO:"
+                                       styleClass="texto_negrita"/>
+                        <p:outputLabel value="#{pedidoBean.pedido.total}"
+                                       styleClass="texto_negrita"
+                                       id="totalPedido"
+                                       style="font-size: 13px;color: red"/>
+                    </h:panelGrid>
+                </p:fieldset>
+            </h:panelGrid>
+            <br/>
+            <p:fieldset id="flsMenu0003"
+                        style="height:100px"
+                        legend="Productos">
+                <ui:repeat value="#{pedidoBean.pedido.terminal.tipoCombustibleList}"
+                           var="item">
+                    <p:commandButton actionListener="#{pedidoBean.agregarDetalle(item)}"
+                                     value="#{item.nombre}"
+                                     process="@this"
+                                     update="formulario:flsMenu0004, formulario:totalPedido, formulario:slcTerminal"
+                                     styleClass="rounded-button" />
+                    <p:spacer width="10px" />
+                </ui:repeat>
+            </p:fieldset>
+            <br/>
+            <p:fieldset id="flsMenu0004"
+                        legend="Detalle Pedido">
+                <h:panelGrid columns="1"
+                             width="80%">
+                    <p:dataTable id="detalleLst"
+                                 var="product"
+                                 rowIndexVar="index"
+                                 value="#{pedidoBean.pedido.pedidoDetalleLst}"
+                                 rowKey="#{product.idPedidoDetalle}"
+                                 editable="true"
+                                 editMode="cell"
+                                 widgetVar="cellProducts">
+
+                        <p:column headerText="Opciones"
+                                  width="5%"
+                                  style="text-align: center">
+                            <p:commandButton icon="pi pi-trash"
+                                             actionListener="#{pedidoBean.eliminar(index)}"
+                                             styleClass="rounded-button ui-button-outlined"
+                                             update="detalleLst, formulario:totalPedido, formulario:grMensajes, formulario:slcTerminal">
+                                <p:confirm header="Contirmación"
+                                           message="Desea eliminar el registro?"
+                                           icon="pi pi-info-circle"/>
+                            </p:commandButton>
+                        </p:column>
+
+                        <p:column headerText="Producto">
+                            <h:outputText value="#{product.tipoCombustible.nombre}" />
+                        </p:column>
+
+                        <p:column headerText="Tipo">
+                            <h:outputText value="Automotriz" rendered="#{product.tipoCombustible.tipo eq 1}"/>
+                            <h:outputText value="Industrial" rendered="#{product.tipoCombustible.tipo eq 2}"/>
+                        </p:column>
+
+                        <p:column headerText="Cantidad"
+                                  style="text-align: right">
+                            <p:cellEditor>
+                                <f:facet name="output">
+                                    <h:outputText value="#{product.volumen}" />
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{product.volumen}"
+                                                   decimalPlaces="2"
+                                                   minValue="0"
+                                                   inputStyle="width:80%;text-align: right;font-size: 13px;font-style: normal;font-weight: bold ">
+                                        <p:ajax update="formulario:detalleLst, formulario:totalPedido"
+                                                listener="#{pedidoBean.onCellEditCantidad(product)}"/>
+                                    </p:inputNumber>
+                                </f:facet>
+                            </p:cellEditor>
+
+                        </p:column>
+
+                        <p:column headerText="Costo"
+                                  style="text-align: right">
+                            <h:outputText value="#{product.costo}" />
+                        </p:column>
+
+                        <p:column headerText="Subtotal"
+                                  style="text-align: right">
+                            <h:outputText value="#{product.subtotal}" />
+                        </p:column>
+                    </p:dataTable>
+                </h:panelGrid>
+            </p:fieldset>
+        </p:panel>
+    </ui:define>
+</ui:composition>
