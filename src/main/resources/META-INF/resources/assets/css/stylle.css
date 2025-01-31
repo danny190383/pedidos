@@ -110,3 +110,7 @@ body .ui-menu .ui-menu-list .ui-menuitem .ui-menuitem-link .ui-menuitem-icon {
 .input-column {
     width: 70%; /* El campo ocupa el resto del espacio */
 }
+
+.columnaEspacio {
+    padding-right: 10px;
+}

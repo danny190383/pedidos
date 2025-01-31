@@ -27,7 +27,7 @@
                     <div style="display: flex; align-items: center;margin-left: 10px;">
                         <img src="/assets/image/logoLogin.png"
                              alt="PS"
-                             style="width: 70px; height: 35px; vertical-align: middle;" />
+                             style="width: 70px; height: 35px; vertical-align: middle" />
 
                         <p:spacer width="10px" />
                         <ui:repeat value="#{userSessionBean.rutasAcceso}" var="item">
@@ -52,7 +52,7 @@
                         <p:link href="#{request.contextPath}/logout" icon="pi pi-power-off" style="display: flex; align-items: center;">
                             <img src="/assets/image/cerrar.png"
                                  alt="Cerrar Sesión"
-                                 style="width: 35px; height: 35px; vertical-align: middle;" />
+                                 style="width: 35px; height: 35px; vertical-align: middle;filter: brightness(50%);opacity: 0.6;" />
                         </p:link>
                     </div>
                 </div>
@@ -65,7 +65,7 @@
                 <p:linkButton outcome="/home.xhtml" style="padding: 0; border: none; background: none;">
                     <img src="/assets/image/hogar.png"
                          alt="PS"
-                         style="width: 30px; height: 30px;" />
+                         style="width: 30px; height: 30px;filter: brightness(50%);opacity: 0.6;" />
                 </p:linkButton>
 
                 <p:menu model="#{userSessionBean.menuModulosAcceos}"

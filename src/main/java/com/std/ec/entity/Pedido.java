@@ -37,6 +37,10 @@ public class Pedido implements Serializable {
     private Usuario usuarioRegistra;
     @Column(name = "total")
     private BigDecimal total;
+    @Column(name = "iva")
+    private BigDecimal iva;
+    @Column(name = "total_general")
+    private BigDecimal totalGeneral;
     @Column(name = "detalle")
     private String detalle;
     @OneToMany(mappedBy = "pedido", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -45,6 +49,8 @@ public class Pedido implements Serializable {
     private List<PedidoCamion> pedidoCamionLst = new ArrayList<>();
     @OneToMany(mappedBy = "pedido", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PedidoDetalle> pedidoDetalleLst = new ArrayList<>();
+    @OneToMany(mappedBy = "pedido", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PedidoImpuestoTarifa> pedidoImpuestoTarifaLst = new ArrayList<>();
 
     public List<PedidoEstado> getPedidoEstadoOrderLst() {
         if (pedidoEstadoLst == null || pedidoEstadoLst.isEmpty()) {

@@ -33,6 +33,9 @@ public class PedidoDetalle  implements Serializable {
     @JoinColumn(name = "id_tipo_combustible", referencedColumnName = "id_tipo_combustible")
     @ManyToOne(optional = false)
     private TipoCombustible tipoCombustible;
+    @JoinColumn(name = "id_impuesto_tarifa", referencedColumnName = "id_impuesto_tarifa")
+    @ManyToOne(optional = false)
+    private ImpuestoTarifa impuestoTarifa;
 
     @Override
     public boolean equals(Object o) {

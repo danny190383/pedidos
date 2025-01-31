@@ -1,7 +1,7 @@
 package com.std.ec.controller;
 
-import com.std.ec.entity.TipoCombustible;
-import com.std.ec.entity.TipoCombustibleCosto;
+import com.std.ec.entity.*;
+import com.std.ec.service.ImpuestoService;
 import com.std.ec.service.impl.ITipoCombustibleService;
 import com.std.ec.util.FacesUtils;
 import jakarta.annotation.PostConstruct;
@@ -22,27 +22,40 @@ public class TipoCombustibleBean implements Serializable {
 	private static final long serialVersionUID = 3L;
     @Autowired
     private ITipoCombustibleService tipoCombustibleService;
+    @Autowired
+    private ImpuestoService impuestoService;
     @Inject
     private UserSessionBean userSession;
 
     private List<TipoCombustible> listTipoCombustibles;
+    private List<Impuesto> listTimpuesto;
+    private Impuesto selectedImpuesto;
+    private ImpuestoTarifa selectedImpuestoTarifa;
     private TipoCombustible tipoCombustible;
     private BigDecimal costo;
     private Boolean nuevoRegistro;
 
     public TipoCombustibleBean() {
         listTipoCombustibles = new ArrayList<>();
+        listTimpuesto = new ArrayList<>();
+        selectedImpuesto = new Impuesto();
+        selectedImpuesto.setImpuestoTarifaList(new ArrayList<>());
+        this.selectedImpuestoTarifa = new ImpuestoTarifa();
+        tipoCombustible = new TipoCombustible();
     }
 
     @PostConstruct
     public void init(){
         this.nuevoRegistro = false;
         listTipoCombustibles = tipoCombustibleService.listar();
-        tipoCombustible = new TipoCombustible();
+        listTimpuesto = impuestoService.listar();
     }
 
     public void nuevo(){
-        tipoCombustible = new TipoCombustible();
+        this.tipoCombustible = new TipoCombustible();
+        selectedImpuesto = new Impuesto();
+        selectedImpuesto.setImpuestoTarifaList(new ArrayList<>());
+        this.selectedImpuestoTarifa = new ImpuestoTarifa();
         this.nuevoRegistro = true;
     }
 
@@ -72,6 +85,9 @@ public class TipoCombustibleBean implements Serializable {
     public void seleccionar(TipoCombustible tipoCombustibleSlc){
         this.tipoCombustible = tipoCombustibleSlc;
         this.nuevoRegistro = false;
+        selectedImpuesto = new Impuesto();
+        selectedImpuesto.setImpuestoTarifaList(new ArrayList<>());
+        this.selectedImpuestoTarifa = new ImpuestoTarifa();
     }
 
     public void guardar(){
@@ -88,6 +104,18 @@ public class TipoCombustibleBean implements Serializable {
         }
     }
 
+    public void agregarImpuesto() {
+        ProductoImpuestoTarifa productoImpuestoTarifa = new ProductoImpuestoTarifa();
+        productoImpuestoTarifa.setTipoCombustible(tipoCombustible);
+        productoImpuestoTarifa.setImpuestoTarifa(this.seleccionarTarifa());
+        this.tipoCombustible.getProductoImpuestoTarifaLst().add(productoImpuestoTarifa);
+    }
+
+    public void eliminarImpuesto(int index){
+        this.tipoCombustible.getProductoImpuestoTarifaLst().remove(index);
+        FacesUtils.addInfoMessage("Registro eliminado.");
+    }
+
     public void eliminar(int index){
         try {
             tipoCombustibleService.eliminarTipoCombustible(this.listTipoCombustibles.get(index));
@@ -96,6 +124,20 @@ public class TipoCombustibleBean implements Serializable {
         }catch (Exception e) {
             FacesUtils.addErrorMessage("Error al eliminar el registro.");
         }
+    }
+
+    public void seleccionarImpuesto(){
+        this.selectedImpuesto =  listTimpuesto.stream()
+                .filter(e -> e.getIdImpuesto().equals(this.selectedImpuesto.getIdImpuesto()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public ImpuestoTarifa seleccionarTarifa(){
+        return   selectedImpuesto.getImpuestoTarifaList().stream()
+                .filter(e -> e.getIdImpuestoTarifa().equals(this.selectedImpuestoTarifa.getIdImpuestoTarifa()))
+                .findFirst()
+                .orElse(null);
     }
 
     public TipoCombustible getTipoCombustible() {
@@ -120,5 +162,29 @@ public class TipoCombustibleBean implements Serializable {
 
     public void setCosto(BigDecimal costo) {
         this.costo = costo;
+    }
+
+    public Impuesto getSelectedImpuesto() {
+        return selectedImpuesto;
+    }
+
+    public void setSelectedImpuesto(Impuesto selectedImpuesto) {
+        this.selectedImpuesto = selectedImpuesto;
+    }
+
+    public ImpuestoTarifa getSelectedImpuestoTarifa() {
+        return selectedImpuestoTarifa;
+    }
+
+    public void setSelectedImpuestoTarifa(ImpuestoTarifa selectedImpuestoTarifa) {
+        this.selectedImpuestoTarifa = selectedImpuestoTarifa;
+    }
+
+    public List<Impuesto> getListTimpuesto() {
+        return listTimpuesto;
+    }
+
+    public void setListTimpuesto(List<Impuesto> listTimpuesto) {
+        this.listTimpuesto = listTimpuesto;
     }
 }

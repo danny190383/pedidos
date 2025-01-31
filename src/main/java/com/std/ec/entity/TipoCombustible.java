@@ -31,6 +31,8 @@ public class TipoCombustible implements Serializable {
     private Boolean estado;
     @OneToMany(mappedBy = "tipoCombustible", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TipoCombustibleCosto> tipoCombustibleCostoLst = new ArrayList<>();
+    @OneToMany(mappedBy = "tipoCombustible", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductoImpuestoTarifa> productoImpuestoTarifaLst = new ArrayList<>();
 
     public TipoCombustible(Long idTipoCombustible, String tipo, String nombre, Boolean estado) {
         this.idTipoCombustible = idTipoCombustible;
@@ -45,6 +47,7 @@ public class TipoCombustible implements Serializable {
         }
         return tipoCombustibleCostoLst.stream()
                 .sorted(Comparator.comparing(TipoCombustibleCosto::getFechaRegistro).reversed())
+                .limit(5)
                 .collect(Collectors.toList());
     }
 

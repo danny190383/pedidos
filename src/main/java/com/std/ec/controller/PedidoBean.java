@@ -2,6 +2,7 @@ package com.std.ec.controller;
 
 import com.std.ec.entity.*;
 import com.std.ec.service.impl.IEstacionServicioService;
+import com.std.ec.service.impl.IImpuestoTarifaService;
 import com.std.ec.service.impl.IPedidoService;
 import com.std.ec.service.impl.IRazonAnulacionService;
 import com.std.ec.util.FacesUtils;
@@ -19,6 +20,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Component("pedidoBean")
 @ViewScoped
@@ -30,6 +32,8 @@ public class PedidoBean implements Serializable {
     private IEstacionServicioService estacionServicioService;
     @Autowired
     private IRazonAnulacionService razonAnulacionService;
+    @Autowired
+    private IImpuestoTarifaService impuestoTarifaService;
     @Inject
     private UserSessionBean userSession;
 
@@ -39,11 +43,13 @@ public class PedidoBean implements Serializable {
     private Boolean nuevoRegistro;
     private Boolean anulando;
     private PedidoEstado pedidoEstadoAnulado;
+    private List<ImpuestoTarifa> listaTarifasIvaActivas;
 
     public PedidoBean() {
         pedido = new Pedido();
         estacionServicioLst = new ArrayList<>();
         pedidoEstadoAnulado = new PedidoEstado();
+        listaTarifasIvaActivas = new ArrayList<>();
         pedidoEstadoAnulado.setRazonAnulacion(new RazonAnulacion());
     }
 
@@ -51,6 +57,7 @@ public class PedidoBean implements Serializable {
     public void init(){
         listRazonAnulacion = razonAnulacionService.listarActivas();
         estacionServicioLst.addAll(estacionServicioService.listarActivas());
+        this.listaTarifasIvaActivas = impuestoTarifaService.getTarifasActivasPorImpuesto(1L);
         this.nuevoPedido();
     }
 
@@ -60,6 +67,8 @@ public class PedidoBean implements Serializable {
         pedido.setCodigo(pedidoService.obtenerSiguienteCodigo().toString());
         pedido.setUsuarioRegistra(userSession.getUsuario());
         pedido.setTotal(BigDecimal.ZERO);
+        pedido.setIva(BigDecimal.ZERO);
+        pedido.setTotalGeneral(BigDecimal.ZERO);
         pedido.setEstacionServicio(new EstacionServicio());
         pedido.setTerminal(new Terminal());
         this.nuevoRegistro = true;
@@ -92,9 +101,22 @@ public class PedidoBean implements Serializable {
     }
 
     public void agregarDetalle(TipoCombustible tipoCombustible){
+        if(tipoCombustible.getProductoImpuestoTarifaLst() == null || tipoCombustible.getProductoImpuestoTarifaLst().isEmpty()){
+            FacesUtils.addErrorMessage("Error el producto no tiene definido % de iva.");
+            return;
+        }
+        boolean yaExiste = pedido.getPedidoDetalleLst() != null &&
+                !pedido.getPedidoDetalleLst().isEmpty() &&
+                pedido.getPedidoDetalleLst().stream()
+                        .anyMatch(detalle -> detalle.getTipoCombustible().equals(tipoCombustible));
+        if (yaExiste) {
+            FacesUtils.addErrorMessage("Error: El tipo de combustible ya está agregado en el pedido.");
+            return;
+        }
         PedidoDetalle pedidoDetalle = new PedidoDetalle();
         pedidoDetalle.setPedido(pedido);
         pedidoDetalle.setTipoCombustible(tipoCombustible);
+        pedidoDetalle.setImpuestoTarifa((tipoCombustible.getProductoImpuestoTarifaLst().get(0)).getImpuestoTarifa());
         if(tipoCombustible.obtenerCostoActivo() != null){
             pedidoDetalle.setCosto(tipoCombustible.obtenerCostoActivo().getCosto());
         }else{
@@ -133,6 +155,7 @@ public class PedidoBean implements Serializable {
     public void eliminar(int index){
         try {
             this.pedido.getPedidoDetalleLst().remove(index);
+            this.calcularSubTotalales();
             this.calcularTotal();
             FacesUtils.addInfoMessage("Registro eliminado.");
         }catch (Exception e) {
@@ -142,7 +165,28 @@ public class PedidoBean implements Serializable {
 
     public void onCellEditCantidad(PedidoDetalle event){
         event.setSubtotal((event.getCosto().multiply(event.getVolumen())).setScale(2, BigDecimal.ROUND_HALF_UP));
+        this.calcularSubTotalales();
         this.calcularTotal();
+    }
+
+    public void calcularSubTotalales() {
+        pedido.setPedidoImpuestoTarifaLst(new ArrayList<>());
+        for (ImpuestoTarifa tarifa : this.listaTarifasIvaActivas){
+            PedidoImpuestoTarifa impuesto = new PedidoImpuestoTarifa();
+            BigDecimal subtotal = BigDecimal.ZERO;
+            for (PedidoDetalle detalle : pedido.getPedidoDetalleLst()) {
+                if(Objects.equals(tarifa.getIdImpuestoTarifa(), detalle.getImpuestoTarifa().getIdImpuestoTarifa())){
+                    subtotal = subtotal.add(detalle.getSubtotal());
+                }
+            }
+            impuesto.setEtiqueta("Subtotal " + tarifa.getDescripcion());
+            impuesto.setBaseImponible(subtotal);
+            impuesto.setPedido(pedido);
+            impuesto.setImpuestoTarifa(tarifa);
+            impuesto.setPorcentaje(new BigDecimal(tarifa.getPorcentaje()));
+            impuesto.setValor((impuesto.getBaseImponible().multiply(impuesto.getPorcentaje().divide(new BigDecimal("100")))).setScale(2, BigDecimal.ROUND_HALF_UP));
+            pedido.getPedidoImpuestoTarifaLst().add(impuesto);
+        }
     }
 
     public void calcularTotal(){
@@ -150,7 +194,14 @@ public class PedidoBean implements Serializable {
         for(PedidoDetalle pedidoDetalle : this.pedido.getPedidoDetalleLst()){
             total = total.add(pedidoDetalle.getSubtotal());
         }
+        BigDecimal valorIvaFactura = BigDecimal.ZERO;
+        for(PedidoImpuestoTarifa impuesto : pedido.getPedidoImpuestoTarifaLst()){
+            valorIvaFactura = valorIvaFactura.add(impuesto.getValor());
+
+        }
+        pedido.setIva(valorIvaFactura);
         pedido.setTotal(total);
+        pedido.setTotalGeneral(valorIvaFactura.add(pedido.getTotal()));
     }
 
     public void choosePedido() {

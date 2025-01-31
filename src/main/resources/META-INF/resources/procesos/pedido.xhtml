@@ -97,8 +97,23 @@
                             <p:ajax event="change" process="@this" listener="#{pedidoBean.seleccionarTerminal}" update="formulario:grMensajes, formulario:flsMenu0003, formulario:slcEstacion"/>
                         </p:selectOneMenu>
 
+                        <p:outputLabel value="SUBTOTAL PEDIDO:" styleClass="texto_negrita"/>
+                        <p:outputLabel value="#{pedidoBean.pedido.total}"
+                                       styleClass="texto_negrita"
+                                       id="totalPedido"
+                                       style="font-size: 13px; color: red; text-align: right !important;"/>
+
+                        <p:outputLabel value="IVA PEDIDO:" styleClass="texto_negrita"/>
+                        <p:outputLabel value="#{pedidoBean.pedido.iva}"
+                                       styleClass="texto_negrita"
+                                       id="ivaPedido"
+                                       style="font-size: 13px; color: red; text-align: right !important;"/>
+
                         <p:outputLabel value="TOTAL PEDIDO:" styleClass="texto_negrita"/>
-                        <p:outputLabel value="#{pedidoBean.pedido.total}" styleClass="texto_negrita" id="totalPedido" style="font-size: 13px;color: red"/>
+                        <p:outputLabel value="#{pedidoBean.pedido.totalGeneral}"
+                                       styleClass="texto_negrita"
+                                       id="generalPedido"
+                                       style="font-size: 13px; color: red; text-align: right !important;"/>
                     </h:panelGrid>
                 </p:fieldset>
 
@@ -133,7 +148,7 @@
                                      value="#{item.nombre}"
                                      process="@this"
                                      disabled="#{pedidoBean.pedido.estaAnulado()}"
-                                     update="formulario:flsMenu0004, formulario:totalPedido, formulario:slcTerminal"
+                                     update="formulario:flsMenu0004, formulario:ivaPedido, formulario:totalPedido, formulario:generalPedido, formulario:slcTerminal, formulario:grMensajes"
                                      styleClass="rounded-button" />
                     <p:spacer width="10px" />
                 </ui:repeat>
@@ -159,11 +174,16 @@
                             <p:commandButton icon="pi pi-trash"
                                              actionListener="#{pedidoBean.eliminar(index)}"
                                              styleClass="rounded-button ui-button-outlined"
-                                             update="detalleLst, formulario:totalPedido, formulario:grMensajes, formulario:slcTerminal">
+                                             update="detalleLst, formulario:ivaPedido, formulario:totalPedido, formulario:generalPedido, formulario:grMensajes, formulario:slcTerminal">
                                 <p:confirm header="Contirmación"
                                            message="Desea eliminar el registro?"
                                            icon="pi pi-info-circle"/>
                             </p:commandButton>
+                        </p:column>
+
+                        <p:column headerText="IVA"
+                                  width="5%">
+                            <h:outputText value="#{product.impuestoTarifa.descripcion}" />
                         </p:column>
 
                         <p:column headerText="Producto">
@@ -186,7 +206,7 @@
                                                    decimalPlaces="2"
                                                    minValue="0"
                                                    inputStyle="width:80%;text-align: right;font-size: 13px;font-style: normal;font-weight: bold ">
-                                        <p:ajax update="formulario:detalleLst, formulario:totalPedido"
+                                        <p:ajax update="formulario:detalleLst, formulario:totalPedido, formulario:ivaPedido, formulario:generalPedido"
                                                 listener="#{pedidoBean.onCellEditCantidad(product)}"/>
                                     </p:inputNumber>
                                 </f:facet>
