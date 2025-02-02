@@ -4,6 +4,7 @@ import com.std.ec.entity.Pedido;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.SortMeta;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -11,7 +12,11 @@ public interface IPedidoService {
 
     List<Pedido> listar();
 
+    Pedido findPedidoById(Long id);
+
     Integer obtenerSiguienteCodigo();
+
+    List<Pedido> obtenerPedidosPorFechaYTurnoPrioritario(LocalDate fecha, Long IdTerminal);
 
     void guardarPedido(Pedido pedido);
 

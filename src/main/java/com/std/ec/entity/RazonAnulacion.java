@@ -22,6 +22,8 @@ public class RazonAnulacion implements Serializable {
     private Long idRazonAnulacion;
     @Column(name = "nombre")
     private String nombre;
+    @Column(name = "tipo")
+    private String tipo;
     @Column(name = "estado")
     private Boolean estado;
 

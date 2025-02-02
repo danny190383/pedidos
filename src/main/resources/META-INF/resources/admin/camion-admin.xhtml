@@ -147,8 +147,9 @@
                                styleClass="texto_negrita"/>
                 <h:panelGrid columns="3" id="pnlTransportista">
                     <p:commandButton update="frmDialog:dlgEmpleadoId"
+                                     process="@this"
                                      icon="pi pi-external-link"
-                                     actionListener="#{camionBean.nuevoPersona()}"
+                                     actionListener="#{camionBean.nuevoPersona}"
                                      oncomplete="PF('dlgEmpleado').show()"/>
 
                     <p:commandButton icon="pi pi-search"

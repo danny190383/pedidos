@@ -17,8 +17,7 @@ import java.util.Set;
 public class Ruta implements Serializable {
 	private static final long serialVersionUID = 21L;
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ruta_seq")
-    @SequenceGenerator(name = "ruta_seq", sequenceName = "pedidos.ruta_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_ruta")
     private Long idRuta;
     @Column(name = "nombre")

@@ -18,8 +18,8 @@ public class RazonAnulacionService implements IRazonAnulacionService {
     }
 
     @Override
-    public List<RazonAnulacion> listarActivas() {
-        return (List<RazonAnulacion>) razonAnulacionRepository.listarActivas();
+    public List<RazonAnulacion> listarActivasPorTipo(String tipo) {
+        return (List<RazonAnulacion>) razonAnulacionRepository.listarActivasPorTipo(tipo);
     }
 
     @Override

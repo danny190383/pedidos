@@ -16,6 +16,7 @@
 	                     paginator="true"
 	                     rows="5"
 	                     id="tblPedidos"
+						 widgetVar="wgPedido"
 	                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
 	                     value="#{buscarPedidoBean.lazyModel}">
 	
@@ -24,10 +25,17 @@
 									 actionListener="#{buscarPedidoBean.selectPersonaFromDialog(pedido)}"/>
 	            </p:column>
 
-				<p:column headerText="Fecha Registro">
+				<p:column headerText="Fecha Registro"
+						  width="10%"
+						  field="fechaRegistro"
+						  filterBy="#{pedido.fechaRegistro}"
+						  sortBy="#{pedido.fechaRegistro}"
+						  filterPlaceholder="Fecha Registro">
+					<f:facet name="filter">
+						<p:datePicker onchange="PF('wgPedido').filter()"/>
+					</f:facet>
 					<h:outputLabel value="#{pedido.fechaRegistro}">
-						<f:convertDateTime timeZone="#{parametrosApplication.timeZone}"
-										   pattern="#{parametrosApplication.formatoFechaHoraSMS}"/>
+						<f:convertDateTime pattern="MM/dd/yyyy HH:mm:ss" type="localDate" />
 					</h:outputLabel>
 				</p:column>
 	
@@ -43,15 +51,15 @@
 						  field="terminal.nombre"
 	                      filterBy="#{pedido.terminal.nombre}"
 	                      sortBy="#{pedido.terminal.nombre}"
-	                      filterPlaceholder="Nombres">
+	                      filterPlaceholder="Terminal">
 	                <h:outputText value="#{pedido.terminal.nombre}"/>
 	            </p:column>
 	
-	            <p:column headerText="Estacion"
+	            <p:column headerText="Estación"
 						  field="estacionServicio.nombre"
 	                      filterBy="#{pedido.estacionServicio.nombre}"
 	                      sortBy="#{pedido.estacionServicio.nombre}"
-	                      filterPlaceholder="Apellidos">
+	                      filterPlaceholder="Estación">
 	                <h:outputText value="#{pedido.estacionServicio.nombre}"/>
 	            </p:column>
 	

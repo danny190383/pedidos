@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -55,7 +56,7 @@ public class PedidoBean implements Serializable {
 
     @PostConstruct
     public void init(){
-        listRazonAnulacion = razonAnulacionService.listarActivas();
+        listRazonAnulacion = razonAnulacionService.listarActivasPorTipo("1");
         estacionServicioLst.addAll(estacionServicioService.listarActivas());
         this.listaTarifasIvaActivas = impuestoTarifaService.getTarifasActivasPorImpuesto(1L);
         this.nuevoPedido();
@@ -63,7 +64,7 @@ public class PedidoBean implements Serializable {
 
     public void nuevoPedido(){
         pedido = new Pedido();
-        pedido.setFechaRegistro(new Date());
+        pedido.setFechaRegistro(LocalDateTime.now());
         pedido.setCodigo(pedidoService.obtenerSiguienteCodigo().toString());
         pedido.setUsuarioRegistra(userSession.getUsuario());
         pedido.setTotal(BigDecimal.ZERO);
@@ -220,6 +221,19 @@ public class PedidoBean implements Serializable {
             this.nuevoRegistro = false;
             this.anulando = false;
         }
+    }
+
+    public void choosePedidoWhatsApp() {
+        DialogFrameworkOptions options = DialogFrameworkOptions.builder()
+                .resizable(false)
+                .draggable(false)
+                .modal(true)
+                .build();
+        PrimeFaces.current().dialog().openDynamic("/busquedas/buscarPedidoWhatsApp", options, null);
+    }
+
+    public void onPedidoWhatsAppChosen(SelectEvent event) {
+        //EN CONSTRUCCION
     }
 
     public Pedido getPedido() {

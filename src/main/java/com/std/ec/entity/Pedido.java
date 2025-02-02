@@ -6,7 +6,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Data
@@ -24,8 +28,7 @@ public class Pedido implements Serializable {
     @Column(name = "codigo")
     private String codigo;
     @Column(name = "fecha_registro")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date fechaRegistro;
+    private LocalDateTime fechaRegistro;
     @JoinColumn(name = "id_terminal", referencedColumnName = "id_terminal")
     @ManyToOne(optional = false)
     private Terminal terminal;
@@ -43,6 +46,10 @@ public class Pedido implements Serializable {
     private BigDecimal totalGeneral;
     @Column(name = "detalle")
     private String detalle;
+    @Column(name = "turno_prioritario")
+    private Boolean turnoPrioritario;
+    @Column(name = "turno_numero")
+    private Integer turnoNumero;
     @OneToMany(mappedBy = "pedido", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PedidoEstado> pedidoEstadoLst = new ArrayList<>();
     @OneToMany(mappedBy = "pedido", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -51,6 +58,8 @@ public class Pedido implements Serializable {
     private List<PedidoDetalle> pedidoDetalleLst = new ArrayList<>();
     @OneToMany(mappedBy = "pedido", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PedidoImpuestoTarifa> pedidoImpuestoTarifaLst = new ArrayList<>();
+    @OneToMany(mappedBy = "pedido", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Cheque> pedidoChequeLst = new ArrayList<>();
 
     public List<PedidoEstado> getPedidoEstadoOrderLst() {
         if (pedidoEstadoLst == null || pedidoEstadoLst.isEmpty()) {

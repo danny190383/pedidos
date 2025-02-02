@@ -90,6 +90,11 @@
                     <h:outputText value="#{terminal.parroquia.descripcion}"/>
                 </p:column>
 
+                <p:column headerText="Prioritarios"
+                          width="4%">
+                    <h:outputText value="#{terminal.turnosPrioritarios}"/>
+                </p:column>
+
                 <p:column headerText="Estado"
                           width="4%">
                     <h:outputText value="ACTIVO" rendered="#{terminal.estado}"/>
@@ -284,6 +289,12 @@
                     </h:panelGrid>
                 </h:panelGrid>
                 <h:panelGrid columns="1">
+                    <p:outputLabel value="Turnos Prioritarios"
+                                   styleClass="texto_negrita"/>
+                    <p:inputNumber value="#{terminalesBean.terminal.turnosPrioritarios}"
+                                   decimalPlaces="0"
+                                   styleClass="full-width"/>
+
                     <p:outputLabel value="Estado"
                                    styleClass="texto_negrita"/>
                     <p:selectBooleanButton onLabel="Activo"

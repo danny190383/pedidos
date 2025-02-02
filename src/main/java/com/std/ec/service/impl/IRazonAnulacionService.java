@@ -6,7 +6,7 @@ import java.util.List;
 public interface IRazonAnulacionService {
     List<RazonAnulacion> listar();
 
-    List<RazonAnulacion> listarActivas();
+    List<RazonAnulacion> listarActivasPorTipo(String tipo);
 
     void eliminarRazonAnulacion(RazonAnulacion razonAnulacion);
 

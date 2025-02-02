@@ -48,6 +48,15 @@
                                 listener="#{pedidoBean.onPedidoChosen}"
                                 update="formulario:grMensajes, @form"/>
                     </p:commandButton>
+                    <p:spacer width="10px" />
+                    <p:commandButton icon="pi pi-search"
+                                     value="Buscar Pedido WhatsApp"
+                                     process="@this"
+                                     action="#{pedidoBean.choosePedidoWhatsApp}">
+                        <p:ajax event="dialogReturn"
+                                listener="#{pedidoBean.onPedidoWhatsAppChosen}"
+                                update="formulario:grMensajes, @form"/>
+                    </p:commandButton>
                 </p:toolbarGroup>
             </p:toolbar>
             <br/>
@@ -62,7 +71,7 @@
                         <p:outputLabel value="FECHA:" styleClass="texto_negrita"/>
                         <p:outputLabel value="#{pedidoBean.pedido.fechaRegistro}"
                                        styleClass="texto_negrita">
-                            <f:convertDateTime timeZone="#{parametrosApplication.timeZone}" pattern="#{parametrosApplication.formatoFechaHoraSMS}"/>
+                            <f:convertDateTime pattern="MM/dd/yyyy HH:mm:ss" type="localDate" />
                         </p:outputLabel>
 
                         <p:outputLabel value="RESPONSABLE:" styleClass="texto_negrita"/>
@@ -241,11 +250,11 @@
             <h:panelGrid columns="2"
                          id="pnlDatosAnular"
                          width="90%">
-                <p:outputLabel value="Razón Anula:" styleClass="texto_negrita"/>
+                <p:outputLabel value="Razón Anulación:" styleClass="texto_negrita"/>
                 <p:selectOneMenu styleClass="full-width" id="slcRazon" style="width: 100%;"
                                  value="#{pedidoBean.pedidoEstadoAnulado.razonAnulacion.idRazonAnulacion}"
                                  required="true"
-                                 requiredMessage="Razón Anula: Campo obligatorio."
+                                 requiredMessage="Razón Anulación: Campo obligatorio."
                                  filter="true" filterMatchMode="startsWith">
                     <f:selectItem itemLabel="--Seleccione--" noSelectionOption="true"/>
                     <f:selectItems value="#{pedidoBean.listRazonAnulacion}"

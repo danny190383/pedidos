@@ -34,6 +34,8 @@ public class Terminal implements Serializable {
     private String email;
     @Column(name = "telefono")
     private String telefono;
+    @Column(name = "turnos_prioritarios")
+    private Integer turnosPrioritarios;
     @JoinColumn(name = "id_empleado", referencedColumnName = "id_empleado")
     @OneToOne(optional = false)
     private Empleado responsable;

@@ -57,6 +57,10 @@
                     <h:outputText value="#{razonA.nombre}"/>
                 </p:column>
 
+                <p:column headerText="Tipo">
+                    <h:outputText value="#{razonA.tipo eq '1' ? 'Pedido' : 'Cheque'}"/>
+                </p:column>
+
                 <p:column headerText="Estado"
                           width="4%">
                     <h:outputText value="ACTIVO" rendered="#{razonA.estado}"/>
@@ -88,6 +92,18 @@
                              styleClass="full-width"
                              id="txtNombre"
                              requiredMessage="Nombre: Campo obligatorio."/>
+
+                <p:outputLabel value="Tipo"
+                               for="slcTipo"
+                               styleClass="texto_negrita"/>
+                <p:selectOneMenu id="slcTipo"
+                                 required="true"
+                                 styleClass="full-width"
+                                 value="#{razonAnulacionBean.razonAnulacion.tipo}">
+                    <f:selectItem itemLabel="-- Seleccionar --" itemValue=""/>
+                    <f:selectItem itemLabel="Pedido" itemValue="1"/>
+                    <f:selectItem itemLabel="Cheque" itemValue="2"/>
+                </p:selectOneMenu>
 
                 <p:outputLabel value="Estado" />
                 <p:selectBooleanButton onLabel="Activo"
