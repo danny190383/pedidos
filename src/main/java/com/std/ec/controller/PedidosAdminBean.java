@@ -103,6 +103,10 @@ public class PedidosAdminBean implements Serializable {
     }
 
     public void chooseCheque() {
+        if(pedidoSelected == null){
+            FacesUtils.addWarMessage("Debe seleccionar un pedido.");
+            return;
+        }
         Map<String, Object> options = new HashMap<>();
         options.put("resizable", false);
         options.put("draggable", false);
@@ -114,8 +118,10 @@ public class PedidosAdminBean implements Serializable {
 
     public void onChequeChosen(SelectEvent event) {
         Pedido pedidoSlc = (Pedido) event.getObject();
-        if(!pedidoSlc.getPedidoChequeLst().isEmpty()){
-            this.guardar(pedidoSlc);
+        if(pedidoSlc != null){
+            if(!pedidoSlc.getPedidoChequeLst().isEmpty()){
+                this.guardar(pedidoSlc);
+            }
         }
     }
 
@@ -126,12 +132,52 @@ public class PedidosAdminBean implements Serializable {
         options.put("modal", true);
         Map<String, List<String>> params = new HashMap<>();
         params.put("pedido", Arrays.asList(pedidoSelected.getIdPedido().toString()));
-        PrimeFaces.current().dialog().openDynamic("/extraDialog/cheque", options, params);
+        PrimeFaces.current().dialog().openDynamic("/extraDialog/validar_cheque", options, params);
     }
 
     public void onValidarChequeChosen(SelectEvent event) {
         Pedido pedidoSlc = (Pedido) event.getObject();
+        if(pedidoSlc != null){
+            this.guardar(pedidoSlc);
+        }
+    }
 
+    public void chooseTransporte() {
+        Map<String, Object> options = new HashMap<>();
+        options.put("resizable", false);
+        options.put("draggable", false);
+        options.put("modal", true);
+        options.put("width", "60%");
+        options.put("contentWidth","100%");
+        Map<String, List<String>> params = new HashMap<>();
+        params.put("pedido", Arrays.asList(pedidoSelected.getIdPedido().toString()));
+        PrimeFaces.current().dialog().openDynamic("/extraDialog/transporte", options, params);
+    }
+
+    public void onTransporteChosen(SelectEvent event) {
+        Pedido pedidoSlc = (Pedido) event.getObject();
+        if(pedidoSlc != null){
+            this.guardar(pedidoSlc);
+        }
+    }
+
+    public void chooseGuia() {
+        Map<String, Object> options = new HashMap<>();
+        options.put("resizable", false);
+        options.put("draggable", false);
+        options.put("modal", true);
+        options.put("width", "50%");
+        options.put("contentWidth","100%");
+        Map<String, List<String>> params = new HashMap<>();
+        params.put("pedido", Arrays.asList(pedidoSelected.getIdPedido().toString()));
+        PrimeFaces.current().dialog().openDynamic("/extraDialog/guia_remision", options, params);
+    }
+
+    public void onGuiaChosen(SelectEvent event) {
+        Pedido pedidoSlc = (Pedido) event.getObject();
+        if(pedidoSlc != null){
+            this.guardar(pedidoSlc);
+        }
     }
 
     public LazyDataModel<Pedido> getLazyModel() {

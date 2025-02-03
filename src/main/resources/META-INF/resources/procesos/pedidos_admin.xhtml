@@ -26,7 +26,8 @@
                     <p:spacer width="10px" />
                     <p:commandButton icon="pi pi-plus"
                                      value="Validar Cheque"
-                                     process="@this"
+                                     process="@this, formulario:tblPedidos"
+                                     update="formulario:grMensajes"
                                      action="#{pedidosAdminBean.chooseValidarCheque}">
                         <p:ajax event="dialogReturn"
                                 listener="#{pedidosAdminBean.onValidarChequeChosen}"
@@ -35,19 +36,21 @@
                     <p:spacer width="10px" />
                     <p:commandButton icon="pi pi-plus"
                                      value="Asignar Transporte"
-                                     process="@this"
-                                     action="#{pedidosAdminBean.chooseCheque}">
+                                     process="@this, formulario:tblPedidos"
+                                     update="formulario:grMensajes"
+                                     action="#{pedidosAdminBean.chooseTransporte}">
                         <p:ajax event="dialogReturn"
-                                listener="#{pedidosAdminBean.onChequeChosen}"
+                                listener="#{pedidosAdminBean.onTransporteChosen}"
                                 update="formulario:grMensajes, @form"/>
                     </p:commandButton>
                     <p:spacer width="10px" />
                     <p:commandButton icon="pi pi-plus"
                                      value="Guia de Remisión"
-                                     process="@this"
-                                     action="#{pedidosAdminBean.chooseCheque}">
+                                     process="@this, formulario:tblPedidos"
+                                     update="formulario:grMensajes"
+                                     action="#{pedidosAdminBean.chooseGuia}">
                         <p:ajax event="dialogReturn"
-                                listener="#{pedidosAdminBean.onChequeChosen}"
+                                listener="#{pedidosAdminBean.onGuiaChosen}"
                                 update="formulario:grMensajes, @form"/>
                     </p:commandButton>
                 </p:toolbarGroup>
@@ -122,6 +125,12 @@
                           width="5%"
                           style="text-align: right">
                     <h:outputText value="#{pedido.total}"/>
+                </p:column>
+
+                <p:column headerText="Estado"
+                          width="5%"
+                          style="text-align: right">
+                    <h:outputText value="#{pedido.obtenerEstadoPrioritario()}" />
                 </p:column>
 
             </p:dataTable>

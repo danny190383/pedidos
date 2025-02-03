@@ -22,4 +22,13 @@ public class FacesUtils {
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, msg));
     }
 
+    public static void addWarMessage(String msg) {
+        addErrorMessage(null, msg);
+    }
+
+    public static void addWarMessage(String clientId, String msg) {
+        FacesContext.getCurrentInstance().addMessage(clientId,
+                new FacesMessage(FacesMessage.SEVERITY_WARN, msg, msg));
+    }
+
 }

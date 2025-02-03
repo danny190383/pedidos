@@ -81,7 +81,7 @@ public class PedidoBean implements Serializable {
         pedidoEstadoAnulado.setPedido(pedido);
         pedidoEstadoAnulado.setFechaRegistro(new Date());
         pedidoEstadoAnulado.setUsuarioRegistra(userSession.getUsuario());
-        pedidoEstadoAnulado.setEstadoPedido(new EstadoPedido(4L));
+        pedidoEstadoAnulado.setEstadoPedido(new EstadoPedido(Pedido.ANULADO));
         pedidoEstadoAnulado.setRazonAnulacion(new RazonAnulacion());
         this.nuevoRegistro = false;
         this.anulando = true;
@@ -192,8 +192,10 @@ public class PedidoBean implements Serializable {
 
     public void calcularTotal(){
         BigDecimal total = BigDecimal.ZERO;
+        BigDecimal totalVolumen = BigDecimal.ZERO;
         for(PedidoDetalle pedidoDetalle : this.pedido.getPedidoDetalleLst()){
             total = total.add(pedidoDetalle.getSubtotal());
+            totalVolumen = totalVolumen.add(pedidoDetalle.getVolumen());
         }
         BigDecimal valorIvaFactura = BigDecimal.ZERO;
         for(PedidoImpuestoTarifa impuesto : pedido.getPedidoImpuestoTarifaLst()){
@@ -202,6 +204,7 @@ public class PedidoBean implements Serializable {
         }
         pedido.setIva(valorIvaFactura);
         pedido.setTotal(total);
+        pedido.setTotalVolumen(totalVolumen);
         pedido.setTotalGeneral(valorIvaFactura.add(pedido.getTotal()));
     }
 

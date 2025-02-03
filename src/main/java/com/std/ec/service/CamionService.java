@@ -39,6 +39,11 @@ public class CamionService implements ICamionService {
     }
 
     @Override
+    public List<Camion> obtenerCamionesDisponibles(float capacidadNecesitada) {
+        return camionRepository.findCamionesDisponiblesPorCapacidad(capacidadNecesitada);
+    }
+
+    @Override
     public List<Camion> getCamiones(int first, int pageSize, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy) {
         // Configurar ordenamiento dinámico
         Sort sort = Sort.unsorted();

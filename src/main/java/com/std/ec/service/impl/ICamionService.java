@@ -11,6 +11,8 @@ import java.util.Map;
 public interface ICamionService {
     List<Camion> listar();
 
+    List<Camion> obtenerCamionesDisponibles(float capacidadNecesitada);
+
     void eliminarCamion(Camion camion);
 
     void guardarCamion(Camion camion);

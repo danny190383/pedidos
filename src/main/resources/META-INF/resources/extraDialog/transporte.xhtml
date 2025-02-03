@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns:h="jakarta.faces.html"
+      xmlns:p="primefaces"
+	  xmlns:f="jakarta.faces.core">
+
+    <h:head>
+        <title>Transporte</title>
+        <h:outputStylesheet library="assets" name="css/primeflex.css"/>
+        <h:outputStylesheet library="assets" name="css/primeicons.css"/>
+        <h:outputStylesheet library="assets" name="css/stylle.css"/>
+    </h:head>
+
+    <h:body style="font-family: var(--font-family);">
+        <h:form id="frmCheque">
+			<p:growl id="grMensajes"
+					 widgetVar="grMensajes"
+					 showDetail="false"
+					 class="grow"/>
+			<p:fieldset legend="Datos Pedido"
+						style="margin-left: 10px; margin-right: 10px">
+				<h:panelGrid columns="4"
+							 width="80%"
+							 id="pnlCabeceraDatos">
+					<p:outputLabel value="Número Turno:"
+								   styleClass="texto_negrita"
+								   for="txtTurno"/>
+					<p:inputNumber value="#{transporteBean.pedido.turnoNumero}"
+								   required="true"
+								   id="txtTurno"
+								   styleClass="full-width"
+								   decimalPlaces="0"
+								   requiredMessage="Número Turno: Campo obligatorio."/>
+
+					<p:outputLabel value="Pedido Codigo:"
+								   styleClass="texto_negrita"/>
+					<p:outputLabel value="#{transporteBean.pedido.codigo}"
+								   styleClass="texto_negrita"/>
+
+					<p:outputLabel value="Volumen Pedido:"
+								   styleClass="texto_negrita"/>
+					<p:outputLabel value="#{transporteBean.pedido.totalVolumen}"
+								   styleClass="texto_negrita"/>
+
+					<p:outputLabel value="Fecha:"
+								   styleClass="texto_negrita"/>
+					<p:outputLabel value="#{transporteBean.pedido.fechaRegistro}"
+								   styleClass="texto_negrita">
+						<f:convertDateTime pattern="MM/dd/yyyy HH:mm:ss" type="localDate" />
+					</p:outputLabel>
+				</h:panelGrid>
+			</p:fieldset>
+			<h:panelGrid columns="2"
+						 style="margin-left: 5px; margin-right: 5px"
+						 columnClasses="topAlignedColumnaPequeña,topAlignedColumnaGrande">
+				<p:fieldset legend="Datos Transporte"
+							style="height:250px">
+					<h:panelGrid columns="1"
+								 width="100%"
+								 id="pnlDatosCheque">
+
+						<p:outputLabel value="Camion Disponible"
+									   styleClass="texto_negrita"/>
+						<p:selectOneMenu value="#{transporteBean.camion}"
+										 styleClass="full-width"
+										 converter="omnifaces.SelectItemsConverter"
+										 var="c"
+										 required="true"
+										 requiredMessage="Selector Camión: Campo Obligatorio"
+										 filter="true"
+										 filterMatchMode="startsWith"
+										 filterNormalize="true">
+
+							<f:selectItem itemLabel="--Seleccione--"
+										  itemValue="" noSelectionOption="true"/>
+
+							<f:selectItems value="#{transporteBean.camionesList}"
+										   var="country"
+										   itemLabel="#{country.placa} #{country.persona.nombreApellido}"
+										   itemValue="#{country}"/>
+
+							<p:column>
+								<f:facet name="header">
+									<h:outputText value="Conductor"/>
+								</f:facet>
+								<h:outputText value="Céd: #{c.persona.cedula}"/><br/>
+								<h:outputText value="Nom: #{c.persona.nombreApellido}"/><br/>
+								<h:outputText value="Tel: #{c.persona.telefono}"/><br/>
+								<h:outputText value="Cor: #{c.persona.email}"/>
+							</p:column>
+
+							<p:column>
+								<f:facet name="header">
+									<h:outputText value="Camión"/>
+								</f:facet>
+								<h:outputText value="Pla: #{c.placa}"/><br/>
+								<h:outputText value="Com: #{c.compartimientos}"/><br/>
+								<h:outputText value="Cap: #{c.capacidad}"/>
+							</p:column>
+
+							<f:facet name="footer">
+								<h:outputText value="#{transporteBean.camionesList.size()} camiones"
+											  style="font-weight:bold;" styleClass="py-1 block"/>
+							</f:facet>
+						</p:selectOneMenu>
+
+						<p:outputLabel value="OBSERVACIÓN:" styleClass="texto_negrita"/>
+						<h:panelGrid columns="1" width="100%">
+							<p:inputTextarea rows="3" style="width: 98%"
+											 value="#{transporteBean.observacion}"
+											 counter="display1"
+											 maxlength="500"
+											 counterTemplate="{0} caracteres restantes."
+											 autoResize="false"/>
+							<h:outputText id="display1" class="block" />
+						</h:panelGrid>
+					</h:panelGrid>
+					<p:commandButton value="Agregar"
+									 actionListener="#{transporteBean.agregarTansporte}"
+									 icon="pi pi-arrow-right"
+									 process="@this,pnlDatosCheque"
+									 update="frmCheque:pnlDatosCheque, tblCheques, frmCheque:grMensajes"/>
+				</p:fieldset>
+				<p:fieldset legend="Tansporte"
+							style="height:250px">
+					<p:dataTable var="camion"
+								 id="tblCheques"
+								 scrollable="true" scrollHeight="150"
+								 value="#{transporteBean.pedido.pedidoCamionLst}">
+
+						<p:column headerText="Transportista">
+							<h:outputText value="Cédula: #{camion.camion.persona.cedula}"/><br/>
+							<h:outputText value="Nombre: #{camion.camion.persona.nombreApellido}"/><br/>
+							<h:outputText value="Teléfono: #{camion.camion.persona.telefono}"/><br/>
+							<h:outputText value="Correo: #{camion.camion.persona.email}"/>
+						</p:column>
+
+						<p:column headerText="Camion">
+							<h:outputText value="Placa: #{camion.camion.placa}"/><br/>
+							<h:outputText value="Compartimientos: #{camion.camion.compartimientos}"/><br/>
+							<h:outputText value="Capacidad: #{camion.camion.capacidad}"/>
+						</p:column>
+
+						<p:column headerText="Estado"
+								  width="10%">
+							<h:outputText value="#{camion.estado ? 'ACT' : 'INA'}" />
+						</p:column>
+					</p:dataTable>
+				</p:fieldset>
+			</h:panelGrid>
+			<br/>
+			<h:panelGrid columns="3" style="margin: 0 auto;">
+				<p:commandButton value="Guardar"
+								 actionListener="#{transporteBean.guardar(true)}"
+								 icon="pi pi-save"
+								 process="@this,frmCheque:tblCheques,frmCheque:pnlCabeceraDatos, frmCheque:grMensajes"
+								 update="@form"/>
+				<p:spacer width="5"/>
+				<p:commandButton value="Cancelar"
+								 icon="pi pi-times"
+								 process="@this"
+								 actionListener="#{transporteBean.guardar(false)}"/>
+			</h:panelGrid>
+			<br/>
+        </h:form>
+    </h:body>
+</html>

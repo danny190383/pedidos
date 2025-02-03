@@ -15,92 +15,12 @@
 			<h:panelGrid columns="2"
 						 style="margin-left: 5px; margin-right: 5px"
 						 columnClasses="topAligned,topAligned">
-				<p:fieldset legend="Datos Cheque"
-							style="height:250px">
-					<h:panelGrid columns="2"
-								 id="pnlDatosCheque">
-						<p:outputLabel value="Numero"
-									   for="txtNumero"
-									   styleClass="texto_negrita"/>
-						<p:inputText value="#{validarChequeBean.cheque.numero}"
-									 required="true"
-									 id="txtNumero"
-									 maxlength="255"
-									 styleClass="full-width"
-									 requiredMessage="Numero: Campo obligatorio.">
-							<p:keyFilter regEx="/[\d\-]/" preventPaste="false"/>
-						</p:inputText>
-
-						<p:outputLabel value="Fecha"
-									   for="txtFecha"
-									   styleClass="texto_negrita"/>
-						<p:datePicker value="#{validarChequeBean.cheque.fecha}"
-									  id="txtFecha"/>
-
-						<p:outputLabel value="Beneficiario"
-									   styleClass="texto_negrita"/>
-						<p:inputText value="#{validarChequeBean.cheque.beneficiario}"
-									 required="true"
-									 id="txtBeneficiario"
-									 maxlength="255"
-									 styleClass="full-width"
-									 requiredMessage="Beneficiario: Campo obligatorio."/>
-
-						<p:outputLabel value="Monto"
-									   for="txtMonto"
-									   styleClass="texto_negrita"/>
-						<p:inputNumber value="#{validarChequeBean.cheque.monto}"
-									   required="true"
-									   id="txtMonto"
-									   styleClass="full-width"
-									   decimalPlaces="2"
-									   requiredMessage="Monto: Campo obligatorio.">
-							<p:ajax update="txtCantidadLetras" />
-						</p:inputNumber>
-
-						<p:spacer/>
-						<h:outputText value="#{validarChequeBean.montoLetras}"
-									  id="txtCantidadLetras"/>
-
-						<p:outputLabel value="Anulado" />
-						<p:selectBooleanButton onLabel="SI"
-											   offLabel="NO"
-											   onIcon="pi pi-check"
-											   offIcon="pi pi-times"
-											   value="#{validarChequeBean.cheque.estado}"/>
-
-						<p:outputLabel value="Razón Anulación:" styleClass="texto_negrita"/>
-						<p:selectOneMenu styleClass="full-width" id="slcRazon" style="width: 100%;"
-										 value="#{validarChequeBean.cheque.razonAnulacion.idRazonAnulacion}"
-										 required="true"
-										 requiredMessage="Razón Anulación: Campo obligatorio."
-										 filter="true" filterMatchMode="startsWith">
-							<f:selectItem itemLabel="--Seleccione--" noSelectionOption="true"/>
-							<f:selectItems value="#{validarChequeBean.listRazonAnulacion}"
-										   var="razon"
-										   itemLabel="#{razon.nombre}"
-										   itemValue="#{razon.idRazonAnulacion}" />
-						</p:selectOneMenu>
-					</h:panelGrid>
-					<p:commandButton value="Agregar"
-									 actionListener="#{validarChequeBean.agregarCheque}"
-									 icon="pi pi-arrow-right"
-									 process="@this,pnlDatosCheque"
-									 update="pnlDatosCheque, tblCheques"/>
-				</p:fieldset>
 				<p:fieldset legend="Cheques"
 							style="height:250px">
 					<p:dataTable var="cheque"
 								 id="tblCheques"
-								 value="#{validarChequeBean.pedido.chequeLst}">
-								 
-						<p:column width="7%">
-							<p:commandButton icon="pi pi-pencil"
-											 styleClass="rounded-button ui-button-outlined"
-											 update="frmCheque:pnlDatosCheque"
-											 process="tblCheques"
-											 action="#{validarChequeBean.seleccionar(cheque)}"/>
-						</p:column>
+								 rowIndexVar="index"
+								 value="#{validarChequeBean.pedido.pedidoChequeLst}">
 
 						<p:column headerText="Número">
 							<h:outputText value="#{cheque.numero}" />
@@ -112,9 +32,90 @@
 
 						<p:column headerText="Estado"
 								  width="10%">
-							<h:outputText value="#{cheque.estado}" />
+							<h:outputText value="#{cheque.estado ? 'ACT' : 'ANU'}" />
+						</p:column>
+
+						<p:column width="7%">
+							<p:commandButton icon="pi pi-pencil"
+											 styleClass="rounded-button ui-button-outlined"
+											 update="frmCheque:pnlDatosCheque"
+											 process="tblCheques"
+											 action="#{validarChequeBean.seleccionar(index)}"/>
 						</p:column>
 					</p:dataTable>
+				</p:fieldset>
+				<p:fieldset legend="Datos Cheque"
+							style="height:250px"
+							id="pnlDatosCheque">
+					<h:panelGrid columns="2"
+								 id="pnlDatosInterno"
+								 rendered="#{validarChequeBean.editando}">
+						<p:outputLabel value="Numero"
+									   styleClass="texto_negrita"/>
+						<p:outputLabel value="#{validarChequeBean.cheque.numero}"
+									   styleClass="texto_negrita"/>
+
+						<p:outputLabel value="Fecha"
+									   styleClass="texto_negrita"/>
+						<h:outputLabel value="#{validarChequeBean.cheque.fecha}">
+							<f:convertDateTime pattern="MM/dd/yyyy" type="localDate" />
+						</h:outputLabel>
+
+						<p:outputLabel value="Beneficiario"
+									   styleClass="texto_negrita"/>
+						<p:outputLabel value="#{validarChequeBean.cheque.beneficiario}"
+									   styleClass="texto_negrita"/>
+
+						<p:outputLabel value="Monto"
+									   styleClass="texto_negrita"/>
+						<p:outputLabel value="#{validarChequeBean.cheque.monto} - #{validarChequeBean.cheque.montoLetras}"
+									   styleClass="texto_negrita"/>
+
+						<p:outputLabel value="Estado"
+									   styleClass="texto_negrita"/>
+						<p:selectBooleanButton onLabel="ACTIVO"
+											   offLabel="ANULADO"
+											   onIcon="pi pi-check"
+											   offIcon="pi pi-times"
+											   value="#{validarChequeBean.cheque.estado}">
+							<p:ajax event="change" update="frmCheque:pnlDatosCheque" process="@this"/>
+						</p:selectBooleanButton>
+
+						<p:outputLabel value="Número Factura:"
+									   styleClass="texto_negrita"
+									   for="txtSecuencialBanco"
+									   rendered="#{validarChequeBean.cheque.estado}"/>
+						<p:inputText value="#{validarChequeBean.cheque.secuencialBanco}"
+									 required="true"
+									 id="txtSecuencialBanco"
+									 maxlength="10"
+									 styleClass="full-width"
+									 requiredMessage="Número Factura: Campo obligatorio."
+									 rendered="#{validarChequeBean.cheque.estado}"/>
+
+						<p:outputLabel value="Razón Anulación:"
+									   styleClass="texto_negrita"
+									   rendered="#{not validarChequeBean.cheque.estado}"/>
+						<p:selectOneMenu styleClass="full-width" id="slcRazon" style="width: 100%;"
+										 value="#{validarChequeBean.cheque.razonAnulacion.idRazonAnulacion}"
+										 required="true"
+										 requiredMessage="Razón Anulación: Campo obligatorio."
+										 filter="true" filterMatchMode="startsWith"
+										 rendered="#{not validarChequeBean.cheque.estado}">
+							<f:selectItem itemLabel="--Seleccione--" noSelectionOption="true"/>
+							<f:selectItems value="#{validarChequeBean.listRazonAnulacion}"
+										   var="razon"
+										   itemLabel="#{razon.nombre}"
+										   itemValue="#{razon.idRazonAnulacion}" />
+						</p:selectOneMenu>
+
+						<p:spacer/>
+						<p:commandButton value="Agregar"
+										 actionListener="#{validarChequeBean.agregarCheque}"
+										 icon="pi pi-arrow-left"
+										 process="@this,frmCheque:pnlDatosInterno"
+										 update="frmCheque:pnlDatosCheque, frmCheque:tblCheques"/>
+					</h:panelGrid>
 				</p:fieldset>
 			</h:panelGrid>
 			<br/>
@@ -122,8 +123,8 @@
 				<p:commandButton value="Guardar"
 								 actionListener="#{validarChequeBean.guardar(true)}"
 								 icon="pi pi-save"
-								 process="@this,pnlDatosCheque"
-								 update="pnlDatosCheque"/>
+								 process="@this,tblCheques"
+								 update="@form"/>
 				<p:spacer width="5"/>
 				<p:commandButton value="Cancelar"
 								 icon="pi pi-times"

@@ -19,7 +19,7 @@ public class PedidoCamion implements Serializable {
     private static final long serialVersionUID = 30L;
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pedido_camion_seq")
-    @SequenceGenerator(name = "pedido_camion_seq", sequenceName = "pedido_camion_seq", allocationSize = 1)
+    @SequenceGenerator(name = "pedido_camion_seq", sequenceName = "pedidos.pedido_camion_seq", allocationSize = 1)
     @Column(name = "id_pedido_camion")
     private Long idPedidoCamion;
     @Column(name = "fecha_registro")
@@ -34,6 +34,10 @@ public class PedidoCamion implements Serializable {
     @JoinColumn(name = "id_pedido", referencedColumnName = "id_pedido")
     @ManyToOne(optional = false)
     private Pedido pedido;
+    @Column(name = "observacion")
+    private String observacion;
+    @Column(name = "estado")
+    private Boolean estado;
     @OneToMany(mappedBy = "pedidoCamion", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PedidoCamionSello> pedidoCamionSelloLst = new ArrayList<>();
 

@@ -119,3 +119,13 @@ body .ui-menu .ui-menu-list .ui-menuitem .ui-menuitem-link .ui-menuitem-icon {
     width: 100% !important;
     box-sizing: border-box; /* Asegura que el padding y el borde estén incluidos en el ancho */
 }
+
+.topAlignedColumnaPequeña {
+    vertical-align: top !important;
+    width: 35% !important;
+}
+
+.topAlignedColumnaGrande {
+    vertical-align: top !important;
+    width: 65% !important;
+}

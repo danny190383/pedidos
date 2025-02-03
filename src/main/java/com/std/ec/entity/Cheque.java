@@ -49,6 +49,11 @@ public class Cheque implements Serializable {
     private Usuario usuarioRegistra;
     @Column(name = "fecha_registro")
     private LocalDateTime fechaRegistro;
+    @JoinColumn(name = "id_usuario_anula", referencedColumnName = "id_usuario")
+    @ManyToOne(optional = true)
+    private Usuario usuarioAnula;
+    @Column(name = "fecha_anula")
+    private LocalDateTime fechaAnula;
     @Column(name = "estado")
     private Boolean estado;
     @Column(name = "secuencial_banco")

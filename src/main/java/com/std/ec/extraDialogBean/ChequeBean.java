@@ -1,9 +1,7 @@
 package com.std.ec.extraDialogBean;
 
 import com.std.ec.controller.UserSessionBean;
-import com.std.ec.entity.Cheque;
-import com.std.ec.entity.Pedido;
-import com.std.ec.entity.RazonAnulacion;
+import com.std.ec.entity.*;
 import com.std.ec.service.impl.IPedidoService;
 import com.std.ec.util.FacesUtils;
 import com.std.ec.util.NumberToWordsConverter;
@@ -17,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Map;
 
 @Named("chequeBean")
@@ -76,6 +75,14 @@ public class ChequeBean implements Serializable {
             if(pedido.getPedidoChequeLst().isEmpty()){
                 FacesUtils.addErrorMessage("No ha registrado cheque.");
                 return;
+            }
+            if(!pedido.estaChequeGenerado()){
+                PedidoEstado pedidoEstado = new PedidoEstado();
+                pedidoEstado.setPedido(pedido);
+                pedidoEstado.setFechaRegistro(new Date());
+                pedidoEstado.setUsuarioRegistra(userSession.getUsuario());
+                pedidoEstado.setEstadoPedido(new EstadoPedido(Pedido.CHEQUE_GENERADO));
+                pedido.getPedidoEstadoLst().add(pedidoEstado);
             }
             PrimeFaces.current().dialog().closeDynamic(pedido);
         }else {

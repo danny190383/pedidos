@@ -67,6 +67,12 @@
 						  style="text-align: right">
 	                <h:outputText value="#{pedido.total}"/>
 	            </p:column>
+
+				<p:column headerText="Estado"
+						  width="7%"
+						  style="text-align: right">
+					<h:outputText value="#{pedido.obtenerEstadoPrioritario()}" />
+				</p:column>
 	
 	        </p:dataTable>
         </h:form>

@@ -1,12 +1,9 @@
 package com.std.ec.extraDialogBean;
 
 import com.std.ec.controller.UserSessionBean;
-import com.std.ec.entity.Cheque;
-import com.std.ec.entity.Pedido;
-import com.std.ec.entity.RazonAnulacion;
+import com.std.ec.entity.*;
 import com.std.ec.service.impl.IPedidoService;
 import com.std.ec.service.impl.IRazonAnulacionService;
-import com.std.ec.util.NumberToWordsConverter;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
@@ -17,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -35,10 +33,11 @@ public class ValidarChequeBean implements Serializable {
     private List<RazonAnulacion> listRazonAnulacion;
     private Pedido pedido;
     private Cheque cheque;
+    private Boolean editando;
+    private int index;
 
     public ValidarChequeBean() {
         cheque = new Cheque();
-        cheque.setRazonAnulacion(new RazonAnulacion());
     }
 
     @PostConstruct
@@ -52,37 +51,46 @@ public class ValidarChequeBean implements Serializable {
             System.out.println("El parámetro 'pedido' es nulo o vacío.");
         }
         listRazonAnulacion = razonAnulacionService.listarActivasPorTipo("2");
+        this.editando = false;
     }
 
-    public void seleccionar(Cheque cheque){
-        this.cheque = cheque;
-    }
-
-    public void agregarCheque( ) {
-        cheque.setFechaRegistro(LocalDateTime.now());
-        cheque.setUsuarioRegistra(userSession.getUsuario());
-        if(cheque.getIdCheque() == null){
-            cheque.setPedido(pedido);
-            cheque.setEstado(true);
-            pedido.getChequeLst().add(cheque);
+    public void seleccionar(int index){
+        this.cheque = this.pedido.getPedidoChequeLst().get(index);
+        if(cheque.getRazonAnulacion() == null){
+            this.cheque.setRazonAnulacion(new RazonAnulacion());
         }
+        this.editando = true;
+        this.index = index;
+    }
+
+    public void agregarCheque() {
+        if(cheque.getEstado()){
+            cheque.setRazonAnulacion(null);
+            cheque.setUsuarioAnula(null);
+            if(!pedido.estaChequeValidado()){
+                PedidoEstado pedidoEstado = new PedidoEstado();
+                pedidoEstado.setPedido(pedido);
+                pedidoEstado.setFechaRegistro(new Date());
+                pedidoEstado.setUsuarioRegistra(userSession.getUsuario());
+                pedidoEstado.setEstadoPedido(new EstadoPedido(Pedido.CHEQUE_VALIDADO));
+                pedido.getPedidoEstadoLst().add(pedidoEstado);
+            }
+        }else{
+            cheque.setFechaAnula(LocalDateTime.now());
+            cheque.setUsuarioAnula(userSession.getUsuario());
+            cheque.setSecuencialBanco(null);
+        }
+        pedido.getPedidoChequeLst().set(index, cheque);
         this.cheque = new Cheque();
+        this.editando = false;
     }
     
     public void guardar(boolean accion ) {
         if(accion){
-            PrimeFaces.current().dialog().closeDynamic(cheque);
+            PrimeFaces.current().dialog().closeDynamic(pedido);
         }else {
             PrimeFaces.current().dialog().closeDynamic(null);
         }
-    }
-
-    public String getMontoLetras() {
-        if (cheque.getMonto() != null) {
-            cheque.setMontoLetras(NumberToWordsConverter.convertir(cheque.getMonto()));
-            return cheque.getMontoLetras();
-        }
-        return "";
     }
 
     public Cheque getCheque() {
@@ -107,5 +115,13 @@ public class ValidarChequeBean implements Serializable {
 
     public void setListRazonAnulacion(List<RazonAnulacion> listRazonAnulacion) {
         this.listRazonAnulacion = listRazonAnulacion;
+    }
+
+    public Boolean getEditando() {
+        return editando;
+    }
+
+    public void setEditando(Boolean editando) {
+        this.editando = editando;
     }
 }
