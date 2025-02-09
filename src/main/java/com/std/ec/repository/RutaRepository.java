@@ -1,14 +1,13 @@
 package com.std.ec.repository;
 
-import com.std.ec.entity.Canton;
 import com.std.ec.entity.Ruta;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface RutaRepository extends CrudRepository<Ruta, Long> {
+public interface RutaRepository extends JpaRepository<Ruta, Long> {
     @Query("SELECT e FROM Ruta e WHERE (:nivel IS NULL OR e.nivel = :nivel)")
     List<Ruta> listarPorNivel(@Param("nivel") Optional<Integer> nivel);
 

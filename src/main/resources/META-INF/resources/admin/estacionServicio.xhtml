@@ -13,15 +13,6 @@
         <p:panel header="ADMINISTRACIÓN ESTACIONES DE SERVICIO"
                  styleClass="custom-panel">
 
-            <p:commandButton value="Buscar Empleado" 
-                             icon="pi pi-home" 
-                             rendered="false" 
-                             action="#{estacionServicioBean.chooseEmpleado}">
-                <p:ajax event="dialogReturn"
-                        listener="#{estacionServicioBean.onEmpleadoChosen}"
-                        update="formulario:grMensajes"/>
-            </p:commandButton>
-
             <p:dataTable var="estacionS"
                          paginator="true"
                          rows="10" 

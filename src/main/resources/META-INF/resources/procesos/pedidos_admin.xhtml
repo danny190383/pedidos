@@ -13,11 +13,20 @@
     <ui:define name="content">
         <p:panel header="ADMINISTRACIÓN DE PEDIDOS"
                  styleClass="custom-panel">
-            <p:toolbar>
+            <p:toolbar id="pnlBotones">
                 <p:toolbarGroup>
                     <p:commandButton icon="pi pi-plus"
+                                     value="Ver Cupo"
+                                     update="frmDialog:dlgCupoId"
+                                     oncomplete="PF('dlgCupo').show()"
+                                     process="@this"
+                                     disabled="#{pedidosAdminBean.pedidoSelected.idPedido eq null}"
+                                     action="#{pedidosAdminBean.cargarCupos}"/>
+                    <p:spacer width="10px" />
+                    <p:commandButton icon="pi pi-plus"
                                      value="Generar Cheque"
-                                     process="@this, formulario:tblPedidos"
+                                     disabled="#{pedidosAdminBean.pedidoSelected.idPedido eq null}"
+                                     process="@this"
                                      action="#{pedidosAdminBean.chooseCheque}">
                         <p:ajax event="dialogReturn"
                                 listener="#{pedidosAdminBean.onChequeChosen}"
@@ -26,7 +35,8 @@
                     <p:spacer width="10px" />
                     <p:commandButton icon="pi pi-plus"
                                      value="Validar Cheque"
-                                     process="@this, formulario:tblPedidos"
+                                     disabled="#{pedidosAdminBean.pedidoSelected.idPedido eq null}"
+                                     process="@this"
                                      update="formulario:grMensajes"
                                      action="#{pedidosAdminBean.chooseValidarCheque}">
                         <p:ajax event="dialogReturn"
@@ -36,7 +46,8 @@
                     <p:spacer width="10px" />
                     <p:commandButton icon="pi pi-plus"
                                      value="Asignar Transporte"
-                                     process="@this, formulario:tblPedidos"
+                                     disabled="#{pedidosAdminBean.pedidoSelected.idPedido eq null}"
+                                     process="@this"
                                      update="formulario:grMensajes"
                                      action="#{pedidosAdminBean.chooseTransporte}">
                         <p:ajax event="dialogReturn"
@@ -46,7 +57,8 @@
                     <p:spacer width="10px" />
                     <p:commandButton icon="pi pi-plus"
                                      value="Guia de Remisión"
-                                     process="@this, formulario:tblPedidos"
+                                     disabled="#{pedidosAdminBean.pedidoSelected.idPedido eq null}"
+                                     process="@this"
                                      update="formulario:grMensajes"
                                      action="#{pedidosAdminBean.chooseGuia}">
                         <p:ajax event="dialogReturn"
@@ -68,6 +80,10 @@
                          paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
                          value="#{pedidosAdminBean.lazyModel}">
 
+                <p:ajax event="rowSelect"
+                        update="formulario:pnlBotones"
+                        listener="#{pedidosAdminBean.onRowSelect}"/>
+
                 <p:column width="5%"
                           headerText="Prioritario">
                     <p:selectBooleanButton onLabel="SI" offLabel="NO"
@@ -78,7 +94,6 @@
                         <p:ajax event="change" listener="#{pedidosAdminBean.asignarPrioritario(index)}"
                         update="formulario:grMensajes, @this"/>
                     </p:selectBooleanButton>
-
                 </p:column>
 
                 <p:column headerText="Fecha Registro"
@@ -121,6 +136,12 @@
                     <h:outputText value="#{pedido.estacionServicio.nombre}"/>
                 </p:column>
 
+                <p:column headerText="Volumen"
+                          width="5%"
+                          style="text-align: right">
+                    <h:outputText value="#{pedido.totalVolumen}"/>
+                </p:column>
+
                 <p:column headerText="Total"
                           width="5%"
                           style="text-align: right">
@@ -137,6 +158,54 @@
         </p:panel>
     </ui:define>
     <ui:define name="dialog">
+        <p:dialog header="Cupo Pedido"
+                  id="dlgCupoId"
+                  widgetVar="dlgCupo"
+                  minHeight="40"
+                  width="50%"
+                  showEffect="fade"
+                  modal="true"
+                  closeOnEscape="true">
 
+            <h:panelGrid columns="1"
+                         id="pnlCupo"
+                         width="100%">
+                <p:dataTable var="cupoDTO"
+                             value="#{pedidosAdminBean.cupoPedidoDTOList}"
+                             style="width: 100%">
+                    <p:column headerText="Combustible">
+                        <h:outputText value="#{cupoDTO.tipoCombustible.nombre}" />
+                    </p:column>
+
+                    <p:column headerText="Mes Cupo">
+                        <h:outputText value="#{cupoDTO.mes}" />
+                    </p:column>
+
+                    <p:column headerText="Volumen Solicitado">
+                        <h:outputText value="#{cupoDTO.volumenSolicitado}" />
+                    </p:column>
+
+                    <p:column headerText="Cupo Diario">
+                        <h:outputText value="#{cupoDTO.cupoDiario}" />
+                    </p:column>
+
+                    <p:column headerText="Cupo Mensual">
+                        <h:outputText value="#{cupoDTO.cupoMensual}" />
+                    </p:column>
+
+                    <p:column headerText="Volumen Acumulado Mes">
+                        <h:outputText value="#{cupoDTO.cupoMesAcumulado}" />
+                    </p:column>
+                </p:dataTable>
+            </h:panelGrid>
+            <br/>
+            <h:panelGrid columns="1" style="margin: 0 auto">
+                <p:commandButton value="Cerrar"
+                                 icon="pi pi-times"
+                                 process="@this"
+                                 update="@form"
+                                 oncomplete="PF('dlgCupo').hide()"/>
+            </h:panelGrid>
+        </p:dialog>
     </ui:define>
 </ui:composition>

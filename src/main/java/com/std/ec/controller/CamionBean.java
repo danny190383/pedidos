@@ -2,8 +2,10 @@ package com.std.ec.controller;
 
 import com.std.ec.entity.Camion;
 import com.std.ec.entity.Persona;
+import com.std.ec.entity.Transportista;
 import com.std.ec.service.impl.ICamionService;
 import com.std.ec.service.impl.IPersonaService;
+import com.std.ec.service.impl.ITransportistaService;
 import com.std.ec.util.FacesUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.view.ViewScoped;
@@ -16,6 +18,7 @@ import org.primefaces.model.SortMeta;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -28,14 +31,18 @@ public class CamionBean implements Serializable {
     private ICamionService camionService;
     @Autowired
     private IPersonaService personaService;
+    @Autowired
+    private ITransportistaService transportistaService;
 
     private LazyDataModel<Camion> listCamion;
+    private List<Transportista> lstTransportista;
     private Camion camion;
     private Persona persona;
 
     public CamionBean() {
         this.camion = new Camion();
         this.persona = new Persona();
+        this.lstTransportista = new ArrayList<>();
     }
 
     @PostConstruct
@@ -55,6 +62,9 @@ public class CamionBean implements Serializable {
 
     public void nuevo(){
         camion = new Camion();
+        if(this.lstTransportista.isEmpty()){
+            this.lstTransportista = transportistaService.listarActivas();
+        }
     }
 
     public void nuevoPersona(){
@@ -63,6 +73,9 @@ public class CamionBean implements Serializable {
 
     public void seleccionar(Camion camionSlc){
         this.camion = camionSlc;
+        if(this.lstTransportista.isEmpty()){
+            this.lstTransportista = transportistaService.listarActivas();
+        }
     }
 
     public void guardar(){
@@ -141,5 +154,13 @@ public class CamionBean implements Serializable {
 
     public void setPersona(Persona persona) {
         this.persona = persona;
+    }
+
+    public List<Transportista> getLstTransportista() {
+        return lstTransportista;
+    }
+
+    public void setLstTransportista(List<Transportista> lstTransportista) {
+        this.lstTransportista = lstTransportista;
     }
 }

@@ -34,6 +34,9 @@ public class Camion implements Serializable {
     @JoinColumn(name = "id_persona", referencedColumnName = "id_persona")
     @OneToOne(optional = false, cascade = CascadeType.MERGE)
     private Persona persona;
+    @JoinColumn(name = "id_transportista", referencedColumnName = "id_transportista")
+    @ManyToOne(optional = false)
+    private Transportista transportista;
 
     @Override
     public boolean equals(Object o) {

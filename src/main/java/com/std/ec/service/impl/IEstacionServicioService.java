@@ -12,6 +12,8 @@ public interface IEstacionServicioService {
 
     List<EstacionServicio> listarActivas();
 
+    List<EstacionServicio> listarActivasPorTerminal(Long idTerminal);
+
     void eliminarEstacionServicio(EstacionServicio terminal);
 
     void guardarEstacionServicio(EstacionServicio terminal);

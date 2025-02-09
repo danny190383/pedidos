@@ -14,10 +14,8 @@ import org.primefaces.PrimeFaces;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Named("transporteBean")
 @ViewScoped
@@ -48,7 +46,7 @@ public class TransporteBean implements Serializable {
         Map<String, String> params = context.getExternalContext().getRequestParameterMap();
         String pedidoId = params.get("pedido");
         if (pedidoId != null && !pedidoId.isEmpty()) {
-            pedido = pedidoService.findPedidoById(Long.parseLong(pedidoId));
+            pedido = pedidoService.findAllWithRelations(Long.parseLong(pedidoId));
         } else {
             System.out.println("El parámetro 'pedido' es nulo o vacío.");
         }
@@ -73,19 +71,19 @@ public class TransporteBean implements Serializable {
         pedidoCamion.setCamion(camion);
         pedidoCamion.setPedido(pedido);
         pedidoCamion.setEstado(true);
-        pedidoCamion.setFechaRegistro(new Date());
+        pedidoCamion.setFechaRegistro(LocalDateTime.now());
         pedidoCamion.setUsuarioRegistra(userSession.getUsuario());
         pedidoCamion.setObservacion(observacion);
         if(!pedido.estaTransporteAsignado()){
             PedidoEstado pedidoEstado = new PedidoEstado();
             pedidoEstado.setPedido(pedido);
-            pedidoEstado.setFechaRegistro(new Date());
+            pedidoEstado.setFechaRegistro(LocalDateTime.now());
             pedidoEstado.setUsuarioRegistra(userSession.getUsuario());
             pedidoEstado.setEstadoPedido(new EstadoPedido(Pedido.TRANSPORTE_ASIGNADO));
             pedido.getPedidoEstadoLst().add(pedidoEstado);
         }
         this.pedido.getPedidoCamionLst().forEach(caminoTmp -> caminoTmp.setEstado(Boolean.FALSE));
-        this.pedido.getPedidoCamionLst().add(0, pedidoCamion);
+        this.pedido.getPedidoCamionLst().add(pedidoCamion);
         this.camion = new Camion();
         this.observacion = "";
     }

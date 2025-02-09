@@ -34,6 +34,11 @@ public class EstacionServicioService  implements IEstacionServicioService {
     }
 
     @Override
+    public List<EstacionServicio> listarActivasPorTerminal(Long idTerminal) {
+        return (List<EstacionServicio>) terminalRepository.listarActivasPorTerminal(idTerminal);
+    }
+
+    @Override
     public void eliminarEstacionServicio(EstacionServicio estacionServicio){
         terminalRepository.delete(estacionServicio);
     }

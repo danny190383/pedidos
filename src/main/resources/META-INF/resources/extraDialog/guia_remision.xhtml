@@ -3,15 +3,162 @@
       xmlns:p="primefaces">
 
     <h:head>
-        <title>Busqueda de Personas</title>
+        <title>Guia de Remisión</title>
         <h:outputStylesheet library="assets" name="css/primeflex.css"/>
         <h:outputStylesheet library="assets" name="css/primeicons.css"/>
         <h:outputStylesheet library="assets" name="css/stylle.css"/>
     </h:head>
 
-    <h:body style="font-family: var(--font-family);">
+    <h:body>
         <h:form>
-	        En construccion
+            <h:panelGrid columns="1"
+                         width="100%">
+                <p:dataTable var="camion"
+                             id="tblCamion"
+                             scrollable="true" scrollHeight="150"
+                             value="#{guiaRemisionBean.pedido.pedidoCamionActivos}">
+
+                    <p:column headerText="Pedido">
+                        <h:outputText value="Número: #{camion.pedido.codigo}"/><br/>
+                        <h:outputText value="Cliente Ruc: #{camion.pedido.estacionServicio.ruc}"/><br/>
+                        <h:outputText value="Cliente: #{camion.pedido.estacionServicio.nombre}"/><br/>
+                    </p:column>
+
+                    <p:column headerText="Transportista">
+                        <h:outputText value="Cédula: #{camion.camion.transportista.persona.cedula}"/><br/>
+                        <h:outputText value="Nombre: #{camion.camion.transportista.persona.nombreApellido}"/><br/>
+                    </p:column>
+
+                    <p:column headerText="Conductor">
+                        <h:outputText value="Cédula: #{camion.camion.persona.cedula}"/><br/>
+                        <h:outputText value="Nombre: #{camion.camion.persona.nombreApellido}"/><br/>
+                    </p:column>
+
+                    <p:column headerText="Camion">
+                        <h:outputText value="Placa: #{camion.camion.placa}"/><br/>
+                        <h:outputText value="Compartimientos: #{camion.camion.compartimientos}"/><br/>
+                        <h:outputText value="Capacidad: #{camion.camion.capacidad}"/>
+                    </p:column>
+                </p:dataTable>
+            </h:panelGrid>
+            <h:panelGrid columns="2"
+                         width="100%"
+                         style="margin-left: 5px; margin-right: 5px"
+                         columnClasses="topAligned,topAligned">
+                <h:panelGrid columns="1"
+                             width="100%">
+                    <p:fieldset legend="GUIA DE REMISIÓN"
+                                style="height:300px">
+                        <h:panelGrid columns="2">
+                            <p:outputLabel value="Punto de Partida"
+                                           for="txtPunto"
+                                           styleClass="texto_negrita"/>
+                            <p:inputText value="#{guiaRemisionBean.guiaRemision.puntoPartida}"
+                                         required="true"
+                                         id="txtPunto"
+                                         maxlength="120"
+                                         styleClass="full-width"
+                                         requiredMessage="Punto: Campo obligatorio."/>
+
+                            <p:outputLabel value="Fecha Inicio"
+                                           for="txtFechaI"
+                                           styleClass="texto_negrita"/>
+                            <p:datePicker value="#{guiaRemisionBean.guiaRemision.fechaInicio}"
+                                          id="txtFechaI"
+                                          required="true"/>
+
+                            <p:outputLabel value="Fecha Fin"
+                                           for="txtFechaF"
+                                           styleClass="texto_negrita"/>
+                            <p:datePicker value="#{guiaRemisionBean.guiaRemision.fechaFin}"
+                                          id="txtFechaF"
+                                          required="true"/>
+
+                            <p:outputLabel value="Motivo Traslado"
+                                           for="txtMotivo"
+                                           styleClass="texto_negrita"/>
+                            <p:inputText value="#{guiaRemisionBean.guiaRemision.motivoTraslado}"
+                                         required="true"
+                                         id="txtMotivo"
+                                         maxlength="120"
+                                         styleClass="full-width"
+                                         requiredMessage="Motivo: Campo obligatorio."/>
+
+                            <p:outputLabel value="Destino"
+                                           for="txtDestino"
+                                           styleClass="texto_negrita"/>
+                            <p:inputText value="#{guiaRemisionBean.guiaRemision.destino}"
+                                         required="true"
+                                         id="txtDestino"
+                                         maxlength="120"
+                                         styleClass="full-width"
+                                         requiredMessage="Destino: Campo obligatorio."/>
+
+                            <p:outputLabel value="Código de Control"
+                                           for="txtCodigo"
+                                           styleClass="texto_negrita"/>
+                            <p:inputText value="#{guiaRemisionBean.guiaRemision.codigoControl}"
+                                         required="true"
+                                         id="txtCodigo"
+                                         maxlength="255"
+                                         styleClass="full-width"
+                                         requiredMessage="Código: Campo obligatorio.">
+                                <p:keyFilter regEx="/[\d\-]/" preventPaste="false"/>
+                            </p:inputText>
+
+                            <p:outputLabel value="Sellos"
+                                           for="txtSellos"
+                                           styleClass="texto_negrita"/>
+                            <p:inputText value="#{guiaRemisionBean.guiaRemision.sellos}"
+                                         required="true"
+                                         id="txtSellos"
+                                         maxlength="255"
+                                         styleClass="full-width"
+                                         requiredMessage="Sellos: Campo obligatorio.">
+                                <p:keyFilter regEx="/[\d\-]/" preventPaste="false"/>
+                            </p:inputText>
+                        </h:panelGrid>
+                    </p:fieldset>
+                </h:panelGrid>
+                <h:panelGrid columns="1"
+                             width="100%">
+                    <p:fieldset legend="DETALLE PEDIDO"
+                                style="height:300px">
+
+                        <p:dataTable id="detalleLst"
+                                     var="product"
+                                     value="#{guiaRemisionBean.pedido.pedidoDetalleLst}">
+
+                            <p:column headerText="Código">
+                                <h:outputText value="#{product.tipoCombustible.codigo}" />
+                            </p:column>
+
+                            <p:column headerText="Producto">
+                                <h:outputText value="#{product.tipoCombustible.nombre}" />
+                            </p:column>
+
+                            <p:column headerText="Cantidad"
+                                      style="text-align: right">
+                                <h:outputText value="#{product.volumen}" />
+                            </p:column>
+                        </p:dataTable>
+                    </p:fieldset>
+                </h:panelGrid>
+            </h:panelGrid>
+            <br/>
+            <h:panelGrid columns="3" style="margin: 0 auto;">
+                <p:commandButton value="Guardar"
+                                 actionListener="#{guiaRemisionBean.guardar(true)}"
+                                 icon="pi pi-save"
+                                 process="@this,@form"
+                                 update="@form"/>
+                <p:spacer width="5"/>
+                <p:commandButton value="Cancelar"
+                                 icon="pi pi-times"
+                                 process="@this"
+                                 actionListener="#{guiaRemisionBean.guardar(false)}"/>
+            </h:panelGrid>
+            <br/>
         </h:form>
     </h:body>
 </html>

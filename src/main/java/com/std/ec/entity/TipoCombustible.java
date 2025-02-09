@@ -15,7 +15,9 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "tipo_combustible", schema = "pedidos")
+@Table(name = "tipo_combustible", schema = "pedidos", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "codigo")
+})
 public class TipoCombustible implements Serializable {
 	private static final long serialVersionUID = 23L;
     @Id
@@ -23,6 +25,8 @@ public class TipoCombustible implements Serializable {
     @SequenceGenerator(name = "tipo_combustible_seq", sequenceName = "pedidos.tipo_combustible_seq", allocationSize = 1)
     @Column(name = "id_tipo_combustible")
     private Long idTipoCombustible;
+    @Column(name = "codigo")
+    private String codigo;
     @Column(name = "tipo")
     private String tipo;
     @Column(name = "nombre")

@@ -46,14 +46,9 @@ public class EstacionServicio implements Serializable {
     private Parroquia parroquia;
     @Column(name = "estado")
     private Boolean estado;
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "terminal_estacion",
-            schema = "pedidos",
-            joinColumns = @JoinColumn(name = "id_estacion_servicio"),
-            inverseJoinColumns = @JoinColumn(name = "id_terminal")
-    )
-    private Set<Terminal> terminalList = new HashSet<>();
+    @OneToMany(mappedBy = "estacionServicio",fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<TerminalEstacion> terminalList = new HashSet<>();
+
 
     @Override
     public boolean equals(Object o) {

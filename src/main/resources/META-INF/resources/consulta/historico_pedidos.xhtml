@@ -1,0 +1,243 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="jakarta.faces.html"
+        xmlns:ui="jakarta.faces.facelets"
+        xmlns:f="http://java.sun.com/jsf/core"
+        template="../templates/templateMenu.xhtml"
+        xmlns:p="primefaces">
+
+    <ui:define name="titulo">
+        Históricos
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="HISTÓRICO DE PEDIDOS"
+                 styleClass="custom-panel">
+            <p:dataTable var="pedido"
+                         paginator="true"
+                         rows="10"
+                         id="tblPedidos"
+                         rowKey="#{pedido.idPedido}"
+                         rowIndexVar="index"
+                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                         value="#{historicoPedidosBean.lazyModel}">
+
+                <p:column headerText="Opción"
+                          width="3%"
+                          style="text-align: center">
+                    <p:commandButton icon="pi pi-plus"
+                                     update="frmDialog:dlgCupoId"
+                                     oncomplete="PF('dlgCupo').show()"
+                                     process="@this"
+                                     actionListener="#{historicoPedidosBean.seleccionarPedido(pedido.idPedido)}"/>
+                </p:column>
+
+                <p:column headerText="Fecha Registro"
+                          width="10%"
+                          field="fechaRegistro"
+                          filterBy="#{pedido.fechaRegistro}"
+                          sortBy="#{pedido.fechaRegistro}"
+                          filterPlaceholder="Fecha Registro">
+                    <f:facet name="filter">
+                        <p:datePicker onchange="PF('wgPedido').filter()"/>
+                    </f:facet>
+                    <h:outputLabel value="#{pedido.fechaRegistro}">
+                        <f:convertDateTime pattern="MM/dd/yyyy HH:mm:ss" type="localDate" />
+                    </h:outputLabel>
+                </p:column>
+
+                <p:column headerText="Código"
+                          field="codigo"
+                          filterBy="#{pedido.codigo}"
+                          sortBy="#{pedido.codigo}"
+                          filterPlaceholder="Código"
+                          width="10%"
+                          style="text-align: center;">
+                    <h:outputText value="#{pedido.codigo}"/>
+                </p:column>
+
+                <p:column headerText="Terminal"
+                          field="terminal.nombre"
+                          filterBy="#{pedido.terminal.nombre}"
+                          sortBy="#{pedido.terminal.nombre}"
+                          filterPlaceholder="Terminal">
+                    <h:outputText value="#{pedido.terminal.nombre}"/>
+                </p:column>
+
+                <p:column headerText="Estación"
+                          field="estacionServicio.nombre"
+                          filterBy="#{pedido.estacionServicio.nombre}"
+                          sortBy="#{pedido.estacionServicio.nombre}"
+                          filterPlaceholder="Estación">
+                    <h:outputText value="#{pedido.estacionServicio.nombre}"/>
+                </p:column>
+
+                <p:column headerText="Volumen"
+                          width="5%"
+                          style="text-align: right">
+                    <h:outputText value="#{pedido.totalVolumen}"/>
+                </p:column>
+
+                <p:column headerText="Total"
+                          width="5%"
+                          style="text-align: right">
+                    <h:outputText value="#{pedido.total}"/>
+                </p:column>
+
+                <p:column headerText="Estado"
+                          width="5%"
+                          style="text-align: right">
+                    <h:outputText value="#{pedido.obtenerEstadoPrioritario()}" />
+                </p:column>
+
+            </p:dataTable>
+        </p:panel>
+    </ui:define>
+    <ui:define name="dialog">
+        <p:dialog header="Cupo Pedido"
+                  id="dlgCupoId"
+                  widgetVar="dlgCupo"
+                  minHeight="40"
+                  width="50%"
+                  showEffect="fade"
+                  modal="true"
+                  closeOnEscape="true">
+            <p:tabView>
+                <p:tab title="Detalle">
+                    <p:dataTable var="detalle"
+                                 value="#{historicoPedidosBean.pedidoSelected.pedidoDetalleLst}"
+                                 style="width: 100%">
+                        <p:column headerText="Combustible">
+                            <h:outputText value="#{detalle.tipoCombustible.nombre}" />
+                        </p:column>
+
+                        <p:column headerText="Impuesto">
+                            <h:outputText value="#{detalle.impuestoTarifa.impuesto.nombre} - #{detalle.impuestoTarifa.descripcion}" />
+                        </p:column>
+
+                        <p:column headerText="Volumen"
+                                  style="text-align: right">
+                            <h:outputText value="#{detalle.volumen}" />
+                        </p:column>
+
+                        <p:column headerText="Costo"
+                                  style="text-align: right">
+                            <h:outputText value="#{detalle.costo}" />
+                        </p:column>
+
+                        <p:column headerText="Subtotal"
+                                  style="text-align: right">
+                            <h:outputText value="#{detalle.subtotal}" />
+                        </p:column>
+
+                    </p:dataTable>
+                </p:tab>
+                <p:tab title="Estados">
+                    <p:dataTable var="estado"
+                                 value="#{historicoPedidosBean.pedidoSelected.pedidoEstadoOrderLst}"
+                                 style="width: 100%">
+                        <p:column headerText="Fecha">
+                            <h:outputText value="#{estado.fechaRegistro}">
+                                <f:convertDateTime timeZone="#{parametrosApplication.timeZone}" pattern="#{parametrosApplication.formatoFechaHoraSMS}"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Responsable">
+                            <h:outputText value="#{estado.usuarioRegistra.empleado.persona.nombreApellido}" />
+                        </p:column>
+                        <p:column headerText="Estado">
+                            <h:outputText value="#{estado.estadoPedido.nombre}" />
+                        </p:column>
+                    </p:dataTable>
+                </p:tab>
+                <p:tab title="Cheque">
+                    <p:dataTable var="cheque"
+                                 value="#{historicoPedidosBean.pedidoSelected.pedidoChequeLst}"
+                                 style="width: 100%">
+
+                        <p:column headerText="Fecha Registro">
+                            <h:outputLabel value="#{cheque.fechaRegistro}">
+                                <f:convertDateTime pattern="MM/dd/yyyy HH:mm:ss" type="localDate" />
+                            </h:outputLabel>
+                        </p:column>
+
+                        <p:column headerText="Responsable">
+                            <h:outputText value="#{cheque.usuarioRegistra.empleado.persona.nombreApellido}" />
+                        </p:column>
+
+                        <p:column headerText="Número">
+                            <h:outputText value="#{cheque.numero}" />
+                        </p:column>
+
+                        <p:column headerText="Fecha">
+                            <h:outputLabel value="#{cheque.fecha}">
+                                <f:convertDateTime pattern="MM/dd/yyyy" type="localDate" />
+                            </h:outputLabel>
+                        </p:column>
+
+                        <p:column headerText="Beneficiario">
+                            <h:outputText value="#{cheque.beneficiario}" />
+                        </p:column>
+
+                        <p:column headerText="Monto">
+                            <h:outputText value="#{cheque.monto}" />
+                        </p:column>
+
+                        <p:column headerText="Estado"
+                                  width="10%">
+                            <h:outputText value="#{cheque.estado ? 'ACT' : 'ANU'}" />
+                        </p:column>
+                    </p:dataTable>
+                </p:tab>
+                <p:tab title="Transporte">
+                    <p:dataTable var="camion"
+                                 value="#{historicoPedidosBean.pedidoSelected.pedidoCamionLst}"
+                                 style="width: 100%">
+
+                        <p:column headerText="Fecha Registro">
+                            <h:outputLabel value="#{camion.fechaRegistro}">
+                                <f:convertDateTime pattern="MM/dd/yyyy HH:mm:ss" type="localDate" />
+                            </h:outputLabel><br/>
+                            <h:outputText value="Responsable: #{camion.usuarioRegistra.empleado.persona.nombreApellido}"/>
+                        </p:column>
+
+                        <p:column headerText="Transportista">
+                            <h:outputText value="Cédula: #{camion.camion.transportista.persona.cedula}"/><br/>
+                            <h:outputText value="Nombre: #{camion.camion.transportista.persona.nombreApellido}"/><br/>
+                            <h:outputText value="Teléfono: #{camion.camion.transportista.persona.telefono}"/><br/>
+                            <h:outputText value="Correo: #{camion.camion.transportista.persona.email}"/>
+                        </p:column>
+
+                        <p:column headerText="Conductor">
+                            <h:outputText value="Cédula: #{camion.camion.persona.cedula}"/><br/>
+                            <h:outputText value="Nombre: #{camion.camion.persona.nombreApellido}"/><br/>
+                            <h:outputText value="Teléfono: #{camion.camion.persona.telefono}"/><br/>
+                            <h:outputText value="Correo: #{camion.camion.persona.email}"/>
+                        </p:column>
+
+                        <p:column headerText="Camion">
+                            <h:outputText value="Placa: #{camion.camion.placa}"/><br/>
+                            <h:outputText value="Compartimientos: #{camion.camion.compartimientos}"/><br/>
+                            <h:outputText value="Capacidad: #{camion.camion.capacidad}"/>
+                        </p:column>
+
+                        <p:column headerText="Estado"
+                                  width="5%">
+                            <h:outputText value="#{camion.estado ? 'ACT' : 'INA'}" />
+                        </p:column>
+                    </p:dataTable>
+                </p:tab>
+                <p:tab title="Header I">
+
+                </p:tab>
+            </p:tabView>
+            <br/>
+            <h:panelGrid columns="1" style="margin: 0 auto">
+                <p:commandButton value="Cerrar"
+                                 icon="pi pi-times"
+                                 process="@this"
+                                 update="@form"
+                                 oncomplete="PF('dlgCupo').hide()"/>
+            </h:panelGrid>
+        </p:dialog>
+    </ui:define>
+</ui:composition>

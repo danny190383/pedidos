@@ -7,7 +7,8 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Data
 @NoArgsConstructor
@@ -39,16 +40,30 @@ public class GuiaRemision implements Serializable {
     private String destino;
     @Column(name = "codigo_control")
     private String codigoControl;
+    @Column(name = "sellos")
+    private Integer sellos;
     @JoinColumn(name = "id_persona", referencedColumnName = "id_persona")
-    @ManyToOne(optional = false, cascade = CascadeType.MERGE)
+    @ManyToOne(optional = true)
     private Persona comercializadora;
     @JoinColumn(name = "id_usuario", referencedColumnName = "id_usuario")
     @ManyToOne(optional = false)
     private Usuario usuarioRegistra;
     @Column(name = "fecha_registro")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date fechaRegistro;
+    private LocalDateTime fechaRegistro;
     @JoinColumn(name = "id_pedido", referencedColumnName = "id_pedido")
     @ManyToOne(optional = false)
     private PedidoCamion pedidoCamion;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GuiaRemision that = (GuiaRemision) o;
+        return Objects.equals(idGuiaRemision, that.idGuiaRemision);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idGuiaRemision);
+    }
 }

@@ -41,6 +41,7 @@ public class BuscarPedidoBean implements Serializable {
     }
 
     public void selectPersonaFromDialog(Pedido pedido) {
+        pedido = pedidoServiceS.findAllWithRelations(pedido.getIdPedido());
         PrimeFaces.current().dialog().closeDynamic(pedido);
     }
 

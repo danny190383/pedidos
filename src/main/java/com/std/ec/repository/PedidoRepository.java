@@ -23,4 +23,16 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long>, JpaSpecif
             @Param("idTerminal") Long idTerminal
     );
 
+    @Query("SELECT p FROM Pedido p " +
+            "LEFT JOIN FETCH p.pedidoCamionLst " +
+            "LEFT JOIN FETCH p.pedidoChequeLst " +
+            "LEFT JOIN FETCH p.pedidoDetalleLst " +
+            "LEFT JOIN FETCH p.pedidoImpuestoTarifaLst " +
+            "WHERE p.idPedido = :id")
+    Pedido findAllWithRelations(@Param("id") Long id);
+
+    @Query("SELECT p FROM Pedido p " +
+            "LEFT JOIN FETCH p.pedidoDetalleLst " +
+            "WHERE p.idPedido = :id")
+    Pedido findAllWithDetalle(@Param("id") Long id);
 }

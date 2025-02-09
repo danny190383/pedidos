@@ -5,6 +5,7 @@ import com.std.ec.repository.TerminalRepository;
 import com.std.ec.service.impl.ITerminalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -15,7 +16,12 @@ public class TerminalService implements ITerminalService {
 
     @Override
     public List<Terminal> listar() {
-        return (List<Terminal>) terminalRepository.findAll();
+        return terminalRepository.findAll();
+    }
+
+    @Override
+    public List<Terminal> findAllWithRelations() {
+        return terminalRepository.findAllWithRelations();
     }
 
     @Override

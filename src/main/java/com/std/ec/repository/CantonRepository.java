@@ -3,13 +3,13 @@ package com.std.ec.repository;
 import com.std.ec.entity.Canton;
 import com.std.ec.entity.CantonPK;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface CantonRepository extends CrudRepository<Canton, CantonPK> {
+public interface CantonRepository extends JpaRepository<Canton, CantonPK> {
 
     @Query("SELECT e FROM Canton e WHERE " +
             "(:estado IS NULL OR e.estado = :estado) AND " +

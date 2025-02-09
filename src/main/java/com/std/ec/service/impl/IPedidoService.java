@@ -12,7 +12,9 @@ public interface IPedidoService {
 
     List<Pedido> listar();
 
-    Pedido findPedidoById(Long id);
+    Pedido findAllWithRelations(Long id);
+
+    Pedido findAllWithDetalle(Long id);
 
     Integer obtenerSiguienteCodigo();
 
@@ -23,4 +25,8 @@ public interface IPedidoService {
     List<Pedido> getPedidos(int first, int pageSize, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy);
 
     long countPedidos(Map<String, FilterMeta> filterBy);
+
+    List<Pedido> getPedidosTodos(int first, int pageSize, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy);
+
+    long countPedidosTodos(Map<String, FilterMeta> filterBy);
 }

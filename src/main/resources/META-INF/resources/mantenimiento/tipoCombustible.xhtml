@@ -53,6 +53,15 @@
                     </h:panelGroup>
                 </p:column>
 
+                <p:column headerText="Código"
+                          sortBy="#{tipoC.codigo}"
+                          filterBy="#{tipoC.codigo}"
+                          filterMatchMode="contains"
+                          filterPlaceholder="Código"
+                          width="5%">
+                    <h:outputText value="#{tipoC.codigo}"/>
+                </p:column>
+
                 <p:column headerText="Tipo Combustible"
                           sortBy="#{tipoC.nombre}"
                           filterBy="#{tipoC.nombre}"
@@ -131,6 +140,17 @@
             <h:panelGrid columns="2"
                          id="pnlDatosTipoCombustible"
                          width="100%">
+
+                <p:outputLabel value="Código"
+                               for="txtCodigo"
+                               styleClass="texto_negrita"/>
+                <p:inputText value="#{tipoCombustibleBean.tipoCombustible.codigo}"
+                             required="true"
+                             maxlength="5"
+                             styleClass="full-width"
+                             id="txtCodigo"
+                             requiredMessage="Código: Campo obligatorio."/>
+
                 <p:outputLabel value="Nombre"
                                for="txtNombre"
                                styleClass="texto_negrita"/>
@@ -153,80 +173,81 @@
                     <f:selectItem itemLabel="Industrial" itemValue="2"/>
                 </p:selectOneMenu>
 
-                <p:outputLabel value="Estado" />
+                <p:outputLabel value="Estado"
+                               styleClass="texto_negrita"/>
                 <p:selectBooleanButton onLabel="Activo"
                                        offLabel="Inactivo"
                                        onIcon="pi pi-check"
                                        offIcon="pi pi-times"
                                        value="#{tipoCombustibleBean.tipoCombustible.estado}"/>
 
-                <p:outputLabel value="Impuesto" />
-                <h:panelGrid columns="1"
-                             width="100%">
-                    <p:dataTable var="impuesto"
-                                 rowIndexVar="indexImpuesto"
-                                 value="#{tipoCombustibleBean.tipoCombustible.productoImpuestoTarifaLst}"
-                                 style="width: 100%"
-                                 id="tablaImpuestos"
-                                 emptyMessage="No hay impuesto registrado.">
+            </h:panelGrid>
+            <h:panelGrid columns="1"
+                         width="100%">
+                <p:dataTable var="impuesto"
+                             rowIndexVar="indexImpuesto"
+                             value="#{tipoCombustibleBean.tipoCombustible.productoImpuestoTarifaLst}"
+                             style="width: 100%"
+                             id="tablaImpuestos"
+                             emptyMessage="No hay impuesto registrado.">
 
-                        <f:facet name="header">
-                            <h:panelGroup styleClass="botonera-opciones"
-                                          style="width: 100%"
-                                          id="pnlImpuesto">
-                                <p:selectOneMenu id="cmbImpuesto"
-                                                 styleClass="full-width"
-                                                 value="#{tipoCombustibleBean.selectedImpuesto.idImpuesto}"
-                                                 required="true"
-                                                 requiredMessage="Impuesto: Campo obligatorio.">
-                                    <f:selectItem itemLabel="--Seleccione--"
-                                                  noSelectionOption="true"/>
-                                    <f:selectItems value="#{tipoCombustibleBean.listTimpuesto}"
-                                                   var="impuesto"
-                                                   itemLabel="#{impuesto.nombre}"
-                                                   itemValue="#{impuesto.idImpuesto}" />
-                                    <p:ajax event="change"
-                                            listener="#{tipoCombustibleBean.seleccionarImpuesto}"
-                                            update="cmbTarifa"/>
-                                </p:selectOneMenu>
-                                <p:selectOneMenu id="cmbTarifa"
-                                                 styleClass="full-width"
-                                                 value="#{tipoCombustibleBean.selectedImpuestoTarifa.idImpuestoTarifa}"
-                                                 required="true"
-                                                 requiredMessage="Tarifa: Campo obligatorio.">
-                                    <f:selectItem itemLabel="--Seleccione--"
-                                                  noSelectionOption="true"/>
-                                    <f:selectItems value="#{tipoCombustibleBean.selectedImpuesto.impuestoTarifaActivos}"
-                                                   var="tarifa"
-                                                   itemLabel="#{tarifa.descripcion}"
-                                                   itemValue="#{tarifa.idImpuestoTarifa}" />
-                                </p:selectOneMenu>
-                                <p:commandButton value="Agregar"
-                                                 process="@this,pnlImpuesto"
-                                                 update="pnlImpuesto, tablaImpuestos, formulario:grMensajes"
-                                                 icon="pi pi-external-link"
-                                                 actionListener="#{tipoCombustibleBean.agregarImpuesto}"/>
-                            </h:panelGroup>
-                        </f:facet>
+                    <f:facet name="header">
+                        <h:panelGroup styleClass="botonera-opciones"
+                                      style="width: 100%"
+                                      id="pnlImpuesto">
+                            <p:selectOneMenu id="cmbImpuesto"
+                                             styleClass="full-width"
+                                             value="#{tipoCombustibleBean.selectedImpuesto.idImpuesto}"
+                                             required="true"
+                                             requiredMessage="Impuesto: Campo obligatorio.">
+                                <f:selectItem itemLabel="--Seleccione--"
+                                              noSelectionOption="true"/>
+                                <f:selectItems value="#{tipoCombustibleBean.listTimpuesto}"
+                                               var="impuesto"
+                                               itemLabel="#{impuesto.nombre}"
+                                               itemValue="#{impuesto.idImpuesto}" />
+                                <p:ajax event="change"
+                                        listener="#{tipoCombustibleBean.seleccionarImpuesto}"
+                                        update="cmbTarifa"/>
+                            </p:selectOneMenu>
+                            <p:selectOneMenu id="cmbTarifa"
+                                             styleClass="full-width"
+                                             value="#{tipoCombustibleBean.selectedImpuestoTarifa.idImpuestoTarifa}"
+                                             required="true"
+                                             requiredMessage="Tarifa: Campo obligatorio.">
+                                <f:selectItem itemLabel="--Seleccione--"
+                                              noSelectionOption="true"/>
+                                <f:selectItems value="#{tipoCombustibleBean.selectedImpuesto.impuestoTarifaActivos}"
+                                               var="tarifa"
+                                               itemLabel="#{tarifa.descripcion}"
+                                               itemValue="#{tarifa.idImpuestoTarifa}" />
+                            </p:selectOneMenu>
+                            <p:commandButton value="Agregar"
+                                             process="@this,pnlImpuesto"
+                                             update="pnlImpuesto, tablaImpuestos, formulario:grMensajes"
+                                             icon="pi pi-external-link"
+                                             actionListener="#{tipoCombustibleBean.agregarImpuesto}"/>
+                        </h:panelGroup>
+                    </f:facet>
 
-                        <p:column headerText="Impuesto">
-                            <h:outputText value="#{impuesto.impuestoTarifa.impuesto.nombre}" />
-                        </p:column>
+                    <p:column headerText="Impuesto">
+                        <h:outputText value="#{impuesto.impuestoTarifa.impuesto.nombre}" />
+                    </p:column>
 
-                        <p:column headerText="Tarifa">
-                            <h:outputText value="#{impuesto.impuestoTarifa.descripcion} / #{impuesto.impuestoTarifa.porcentaje}" />
-                        </p:column>
+                    <p:column headerText="Tarifa">
+                        <h:outputText value="#{impuesto.impuestoTarifa.descripcion} / #{impuesto.impuestoTarifa.porcentaje}" />
+                    </p:column>
 
-                        <p:column headerText="Opción"
-                                  width="40"
-                                  style="text-align: center">
+                    <p:column headerText="Opción"
+                              width="40"
+                              style="text-align: center">
 
-                            <p:commandButton  icon="pi pi-trash"
-                                              update="tablaImpuestos"
-                                              actionListener="#{tipoCombustibleBean.eliminarImpuesto(indexImpuesto)}" />
-                        </p:column>
-                    </p:dataTable>
-                </h:panelGrid>
+                        <p:commandButton  icon="pi pi-trash"
+                                          update="tablaImpuestos"
+                                          process="@this, formulario:tablaImpuestos"
+                                          actionListener="#{tipoCombustibleBean.eliminarImpuesto(indexImpuesto)}" />
+                    </p:column>
+                </p:dataTable>
             </h:panelGrid>
             <br/>
             <h:panelGrid columns="3" style="margin: 0 auto">

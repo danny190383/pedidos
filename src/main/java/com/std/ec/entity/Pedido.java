@@ -7,10 +7,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Data
@@ -54,14 +51,14 @@ public class Pedido implements Serializable {
     private Integer turnoNumero;
     @OneToMany(mappedBy = "pedido", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PedidoEstado> pedidoEstadoLst = new ArrayList<>();
-    @OneToMany(mappedBy = "pedido", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PedidoCamion> pedidoCamionLst = new ArrayList<>();
-    @OneToMany(mappedBy = "pedido", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PedidoDetalle> pedidoDetalleLst = new ArrayList<>();
-    @OneToMany(mappedBy = "pedido", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PedidoImpuestoTarifa> pedidoImpuestoTarifaLst = new ArrayList<>();
-    @OneToMany(mappedBy = "pedido", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Cheque> pedidoChequeLst = new ArrayList<>();
+    @OneToMany(mappedBy = "pedido", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<PedidoCamion> pedidoCamionLst = new LinkedHashSet<>();
+    @OneToMany(mappedBy = "pedido", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Cheque> pedidoChequeLst = new LinkedHashSet<>();
+    @OneToMany(mappedBy = "pedido", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<PedidoDetalle> pedidoDetalleLst = new LinkedHashSet<>();
+    @OneToMany(mappedBy = "pedido", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<PedidoImpuestoTarifa> pedidoImpuestoTarifaLst = new LinkedHashSet<>();
 
     public final static Long GENERADO = 1L;
     public final static Long CHEQUE_GENERADO = 2L;
@@ -76,6 +73,15 @@ public class Pedido implements Serializable {
         }
         return pedidoEstadoLst.stream()
                 .sorted(Comparator.comparing(PedidoEstado::getFechaRegistro).reversed())
+                .collect(Collectors.toList());
+    }
+
+    public List<PedidoCamion> getPedidoCamionActivos() {
+        if (pedidoCamionLst == null || pedidoCamionLst.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return pedidoCamionLst.stream()
+                .filter(PedidoCamion::getEstado)
                 .collect(Collectors.toList());
     }
 
@@ -133,7 +139,7 @@ public class Pedido implements Serializable {
                         && pedidoEstado.getEstadoPedido().getIdEstadoPedido().equals(ANULADO));
     }
 
-    public Boolean estaDespachadoo() {
+    public Boolean estaDespachado() {
         if (pedidoEstadoLst == null || pedidoEstadoLst.isEmpty()) {
             return false;
         }
@@ -145,7 +151,7 @@ public class Pedido implements Serializable {
     public String obtenerEstadoPrioritario() {
         if (estaAnulado()) {
             return "Anulado";
-        } else if (estaDespachadoo()) {
+        } else if (estaDespachado()) {
             return "Despachado";
         } else if (estaFinanciero()) {
             return "Financiero";

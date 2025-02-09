@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -23,8 +23,7 @@ public class PedidoCamion implements Serializable {
     @Column(name = "id_pedido_camion")
     private Long idPedidoCamion;
     @Column(name = "fecha_registro")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date fechaRegistro;
+    private LocalDateTime fechaRegistro;
     @JoinColumn(name = "id_camion", referencedColumnName = "id_camion")
     @ManyToOne(optional = true)
     private Camion camion;
@@ -40,6 +39,8 @@ public class PedidoCamion implements Serializable {
     private Boolean estado;
     @OneToMany(mappedBy = "pedidoCamion", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PedidoCamionSello> pedidoCamionSelloLst = new ArrayList<>();
+    @OneToMany(mappedBy = "pedidoCamion", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<GuiaRemision> guiaRemisionLst = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {

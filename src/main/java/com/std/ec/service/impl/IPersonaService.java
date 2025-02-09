@@ -12,6 +12,8 @@ public interface IPersonaService {
 
     void guardarPersona(Persona persona);
 
+    void eliminarPersona(Persona persona);
+
     List<Persona> getPersonas(int first, int pageSize, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy);
 
     long countPersonas(Map<String, FilterMeta> filterBy);

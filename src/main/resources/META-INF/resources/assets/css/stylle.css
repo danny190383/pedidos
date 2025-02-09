@@ -129,3 +129,15 @@ body .ui-menu .ui-menu-list .ui-menuitem .ui-menuitem-link .ui-menuitem-icon {
     vertical-align: top !important;
     width: 65% !important;
 }
+
+body .ui-dialog .ui-dialog-titlebar {
+    padding: 1rem !important;
+}
+
+.columnaPequeña {
+    text-align: left;
+}
+
+.columnaNumeros {
+    text-align: right;
+}

@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -54,15 +55,9 @@ public class Terminal implements Serializable {
             joinColumns = @JoinColumn(name = "id_terminal"),
             inverseJoinColumns = @JoinColumn(name = "id_tipo_combustible")
     )
-    private Set<TipoCombustible> tipoCombustibleList = new HashSet<>();
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "terminal_estacion",
-            schema = "pedidos",
-            joinColumns = @JoinColumn(name = "id_terminal"),
-            inverseJoinColumns = @JoinColumn(name = "id_estacion_servicio")
-    )
-    private Set<EstacionServicio> estacionServicioList = new HashSet<>();
+    private Set<TipoCombustible> tipoCombustibleList = new LinkedHashSet<>();
+    @OneToMany(mappedBy = "terminal",fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<TerminalEstacion> estacionServicioList = new LinkedHashSet<>();
 
     @Override
     public boolean equals(Object o) {

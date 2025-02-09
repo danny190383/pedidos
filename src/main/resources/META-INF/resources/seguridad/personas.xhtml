@@ -1,0 +1,178 @@
+<ui:composition
+		xmlns="http://www.w3.org/1999/xhtml"
+		xmlns:ui="jakarta.faces.facelets"
+		xmlns:h="http://java.sun.com/jsf/html"
+		template="../templates/templateMenu.xhtml"
+		xmlns:f="http://java.sun.com/jsf/core"
+		xmlns:p="primefaces">
+
+	<ui:define name="titulo">
+		PERSONAS
+	</ui:define>
+
+	<ui:define name="content">
+		<p:panel header="ADMINISTRACIÓN DE PERSONAS"
+				 styleClass="custom-panel">
+	        <p:dataTable var="persona"
+	                     paginator="true"
+	                     rows="10"
+	                     id="tblEmpleados"
+						 rowIndexVar="index"
+	                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+	                     value="#{buscarPersonaBean.lazyModel}">
+
+				<f:facet name="header">
+					<p:commandButton value="Nuevo"
+									 update="frmDialog:dlgPersonaId"
+									 icon="pi pi-external-link"
+									 actionListener="#{buscarPersonaBean.nuevo}"
+									 oncomplete="PF('dlgPersona').show()"/>
+				</f:facet>
+
+				<p:column headerText="Opciones"
+						  width="5%">
+					<h:panelGroup styleClass="botonera-opciones">
+						<p:commandButton icon="pi pi-trash"
+										 actionListener="#{buscarPersonaBean.eliminar(index)}"
+										 styleClass="rounded-button ui-button-outlined"
+										 update="tblEmpleados, formulario:grMensajes">
+							<p:confirm header="Contirmación"
+									   message="Desea eliminar el registro?"
+									   icon="pi pi-info-circle"/>
+						</p:commandButton>
+
+						<p:commandButton icon="pi pi-pencil"
+										 styleClass="rounded-button ui-button-outlined"
+										 update="frmDialog:dlgPersonaId"
+										 oncomplete="PF('dlgPersona').show()"
+										 process="tblEmpleados"
+										 action="#{buscarPersonaBean.seleccionar(persona)}"/>
+					</h:panelGroup>
+				</p:column>
+	
+	            <p:column headerText="Identificación"
+						  field="cedula"
+	                      filterBy="#{persona.cedula}"
+	                      sortBy="#{persona.cedula}"
+	                      filterPlaceholder="Cédula"
+						  width="10%">
+	                <h:outputText value="#{persona.cedula}"/>
+	            </p:column>
+	
+	            <p:column headerText="Nombres"
+						  field="nombres"
+	                      filterBy="#{persona.nombres}"
+	                      sortBy="#{persona.nombres}"
+	                      filterPlaceholder="Nombres">
+	                <h:outputText value="#{persona.nombres}"/>
+	            </p:column>
+	
+	            <p:column headerText="Apellidos"
+						  field="apellidos"
+	                      filterBy="#{persona.apellidos}"
+	                      sortBy="#{persona.apellidos}"
+	                      filterPlaceholder="Apellidos">
+	                <h:outputText value="#{persona.apellidos}"/>
+	            </p:column>
+	
+	            <p:column headerText="Teléfono"
+						  width="10%">
+	                <h:outputText value="#{persona.telefono}"/>
+	            </p:column>
+
+				<p:column headerText="Correo"
+						  width="10%">
+					<h:outputText value="#{persona.email}"/>
+				</p:column>
+	
+	        </p:dataTable>
+		</p:panel>
+	</ui:define>
+	<ui:define name="dialog">
+		<p:dialog header="Persona"
+				  id="dlgPersonaId"
+				  widgetVar="dlgPersona"
+				  minHeight="40"
+				  width="45%"
+				  showEffect="fade"
+				  modal="true"
+				  closeOnEscape="true">
+
+			<h:panelGrid columns="2"
+						 width="100%"
+						 id="pnlDatosPersona">
+				<p:outputLabel value="Cédula"
+							   for="txtCedula"
+							   styleClass="texto_negrita"/>
+				<p:inputText value="#{buscarPersonaBean.persona.cedula}"
+							 required="true"
+							 id="txtCedula"
+							 maxlength="13"
+							 styleClass="full-width"
+							 validatorMessage="Formato de cédula incorrecto."
+							 requiredMessage="Cédula: Campo obligatorio.">
+					<p:keyFilter regEx="/[\d\-]/" preventPaste="false"/>
+					<f:validator validatorId="validarCedulaRuc"/>
+					<p:ajax event="change"
+							listener="#{buscarPersonaBean.verificarCedulaSistema()}"
+							process="@this"
+							update="pnlDatosPersona"/>
+				</p:inputText>
+
+				<p:outputLabel value="Nombres"
+							   for="txtNombre"
+							   styleClass="texto_negrita"/>
+				<p:inputText value="#{buscarPersonaBean.persona.nombres}"
+							 required="true"
+							 id="txtNombre"
+							 maxlength="255"
+							 styleClass="full-width"
+							 requiredMessage="Nombres: Campo obligatorio."/>
+
+				<p:outputLabel value="Apellidos"
+							   for="txtApellidos"
+							   styleClass="texto_negrita"/>
+				<p:inputText value="#{buscarPersonaBean.persona.apellidos}"
+							 required="true"
+							 id="txtApellidos"
+							 maxlength="255"
+							 styleClass="full-width"
+							 requiredMessage="Apellidos: Campo obligatorio."/>
+
+				<p:outputLabel value="Email"
+							   for="txtEmail"
+							   styleClass="texto_negrita"/>
+				<p:inputText value="#{buscarPersonaBean.persona.email}"
+							 maxlength="50"
+							 id="txtEmail"
+							 styleClass="full-width"
+							 validatorMessage="Formato de correo incorrecto.">
+					<f:validator validatorId="validarEmail"/>
+				</p:inputText>
+
+				<p:outputLabel value="Teléfono"
+							   for="txtTelefono"
+							   styleClass="texto_negrita"/>
+				<p:inputText value="#{buscarPersonaBean.persona.telefono}"
+							 maxlength="10"
+							 id="txtTelefono"
+							 styleClass="full-width">
+					<p:keyFilter regEx="/[\d]/"/>
+				</p:inputText>
+			</h:panelGrid>
+			<br/>
+			<h:panelGrid columns="3" style="margin: 0 auto;">
+				<p:commandButton value="Guardar"
+								 actionListener="#{buscarPersonaBean.guardarPersona}"
+								 icon="pi pi-save"
+								 process="@this,pnlDatosPersona"
+								 update="pnlDatosPersona, formulario:tblEmpleados, formulario:grMensajes"/>
+				<p:spacer width="5"/>
+				<p:commandButton value="Cancelar"
+								 icon="pi pi-times"
+								 process="@this"
+								 oncomplete="PF('dlgPersona').hide()"/>
+			</h:panelGrid>
+		</p:dialog>
+	</ui:define>
+</ui:composition>

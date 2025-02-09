@@ -19,7 +19,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -79,7 +79,7 @@ public class PedidoBean implements Serializable {
     public void generarAnular(){
         pedidoEstadoAnulado = new PedidoEstado();
         pedidoEstadoAnulado.setPedido(pedido);
-        pedidoEstadoAnulado.setFechaRegistro(new Date());
+        pedidoEstadoAnulado.setFechaRegistro(LocalDateTime.now());
         pedidoEstadoAnulado.setUsuarioRegistra(userSession.getUsuario());
         pedidoEstadoAnulado.setEstadoPedido(new EstadoPedido(Pedido.ANULADO));
         pedidoEstadoAnulado.setRazonAnulacion(new RazonAnulacion());
@@ -95,10 +95,13 @@ public class PedidoBean implements Serializable {
     }
 
     public void seleccionarTerminal(){
-        pedido.setTerminal(pedido.getEstacionServicio().getTerminalList().stream()
-                .filter(e -> e.getIdTerminal().equals(pedido.getTerminal().getIdTerminal()))
-                .findFirst()
-                .orElse(null));
+        pedido.setTerminal(
+        	    pedido.getEstacionServicio().getTerminalList().stream()
+        	        .map(TerminalEstacion::getTerminal) 
+        	        .filter(t -> t.getIdTerminal().equals(pedido.getTerminal().getIdTerminal()))
+        	        .findFirst()
+        	        .orElse(null)
+        	);
     }
 
     public void agregarDetalle(TipoCombustible tipoCombustible){
@@ -138,7 +141,7 @@ public class PedidoBean implements Serializable {
             if(this.nuevoRegistro){
                 PedidoEstado pedidoEstado = new PedidoEstado();
                 pedidoEstado.setPedido(pedido);
-                pedidoEstado.setFechaRegistro(new Date());
+                pedidoEstado.setFechaRegistro(LocalDateTime.now());
                 pedidoEstado.setUsuarioRegistra(userSession.getUsuario());
                 pedidoEstado.setEstadoPedido(new EstadoPedido(1L));
                 pedido.getPedidoEstadoLst().add(pedidoEstado);
@@ -155,7 +158,9 @@ public class PedidoBean implements Serializable {
 
     public void eliminar(int index){
         try {
-            this.pedido.getPedidoDetalleLst().remove(index);
+            List<PedidoDetalle> list = new ArrayList<>(this.pedido.getPedidoDetalleLst());
+            list.remove(index);
+            this.pedido.setPedidoDetalleLst(new LinkedHashSet<>(list));
             this.calcularSubTotalales();
             this.calcularTotal();
             FacesUtils.addInfoMessage("Registro eliminado.");
@@ -171,7 +176,7 @@ public class PedidoBean implements Serializable {
     }
 
     public void calcularSubTotalales() {
-        pedido.setPedidoImpuestoTarifaLst(new ArrayList<>());
+        pedido.setPedidoImpuestoTarifaLst(new LinkedHashSet<>());
         for (ImpuestoTarifa tarifa : this.listaTarifasIvaActivas){
             PedidoImpuestoTarifa impuesto = new PedidoImpuestoTarifa();
             BigDecimal subtotal = BigDecimal.ZERO;

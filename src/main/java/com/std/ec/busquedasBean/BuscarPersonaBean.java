@@ -1,7 +1,9 @@
 package com.std.ec.busquedasBean;
 
 import com.std.ec.entity.Persona;
+import com.std.ec.entity.Transportista;
 import com.std.ec.service.impl.IPersonaService;
+import com.std.ec.util.FacesUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Named;
@@ -23,6 +25,7 @@ public class BuscarPersonaBean implements Serializable {
     private IPersonaService personaService;
 
     private LazyDataModel<Persona> lazyModel;
+    private Persona persona;
 
     @PostConstruct
     public void init(){
@@ -39,11 +42,46 @@ public class BuscarPersonaBean implements Serializable {
         };
     }
 
+    public void guardarPersona(){
+        try {
+            personaService.guardarPersona(this.persona);
+            PrimeFaces.current().executeScript("PF('dlgPersona').hide();");
+            FacesUtils.addInfoMessage("Registro guardado.");
+        } catch (Exception e) {
+            FacesUtils.addErrorMessage("Error al guardar el registro.");
+        }
+    }
+
+    public void seleccionar(Persona persona){
+        this.persona = persona;
+    }
+
+    public void nuevo(){
+        persona = new Persona();
+    }
+
+    public void eliminar(int index){
+        try {
+            personaService.eliminarPersona(this.lazyModel.getWrappedData().get(index));
+            FacesUtils.addInfoMessage("Registro eliminado.");
+        }catch (Exception e) {
+            FacesUtils.addErrorMessage("Error al eliminar el registro.");
+        }
+    }
+
     public void selectPersonaFromDialog(Persona persona) {
         PrimeFaces.current().dialog().closeDynamic(persona);
     }
 
     public LazyDataModel<Persona> getLazyModel() {
         return lazyModel;
+    }
+
+    public Persona getPersona() {
+        return persona;
+    }
+
+    public void setPersona(Persona persona) {
+        this.persona = persona;
     }
 }

@@ -14,9 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Named("validarChequeBean")
 @ViewScoped
@@ -46,7 +44,7 @@ public class ValidarChequeBean implements Serializable {
         Map<String, String> params = context.getExternalContext().getRequestParameterMap();
         String pedidoId = params.get("pedido");
         if (pedidoId != null && !pedidoId.isEmpty()) {
-            pedido = pedidoService.findPedidoById(Long.parseLong(pedidoId));
+            pedido = pedidoService.findAllWithRelations(Long.parseLong(pedidoId));
         } else {
             System.out.println("El parámetro 'pedido' es nulo o vacío.");
         }
@@ -55,7 +53,8 @@ public class ValidarChequeBean implements Serializable {
     }
 
     public void seleccionar(int index){
-        this.cheque = this.pedido.getPedidoChequeLst().get(index);
+    	List<Cheque> chequeList = new ArrayList<>(this.pedido.getPedidoChequeLst());
+        this.cheque = chequeList.get(index);
         if(cheque.getRazonAnulacion() == null){
             this.cheque.setRazonAnulacion(new RazonAnulacion());
         }
@@ -70,7 +69,7 @@ public class ValidarChequeBean implements Serializable {
             if(!pedido.estaChequeValidado()){
                 PedidoEstado pedidoEstado = new PedidoEstado();
                 pedidoEstado.setPedido(pedido);
-                pedidoEstado.setFechaRegistro(new Date());
+                pedidoEstado.setFechaRegistro(LocalDateTime.now());
                 pedidoEstado.setUsuarioRegistra(userSession.getUsuario());
                 pedidoEstado.setEstadoPedido(new EstadoPedido(Pedido.CHEQUE_VALIDADO));
                 pedido.getPedidoEstadoLst().add(pedidoEstado);
@@ -80,7 +79,8 @@ public class ValidarChequeBean implements Serializable {
             cheque.setUsuarioAnula(userSession.getUsuario());
             cheque.setSecuencialBanco(null);
         }
-        pedido.getPedidoChequeLst().set(index, cheque);
+        pedido.getPedidoChequeLst().removeIf(c -> c.getIdCheque().equals(cheque.getIdCheque())); 
+        pedido.getPedidoChequeLst().add(cheque); 
         this.cheque = new Cheque();
         this.editando = false;
     }

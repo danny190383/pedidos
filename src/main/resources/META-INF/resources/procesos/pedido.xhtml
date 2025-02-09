@@ -93,16 +93,34 @@
                 <p:fieldset id="flsMenu0002" style="height: 200px;" legend="Datos Pedido">
                     <h:panelGrid columns="2" style="width: 100%;" columnClasses="label-column, input-column">
                         <p:outputLabel value="ESTACIÓN:" styleClass="texto_negrita"/>
-                        <p:selectOneMenu styleClass="full-width" id="slcEstacion" style="width: 100%;" disabled="#{pedidoBean.pedido.terminal.idTerminal ne null}" value="#{pedidoBean.pedido.estacionServicio.idEstacionServicio}" required="true" requiredMessage="Estación: Campo obligatorio." filter="true" filterMatchMode="startsWith">
+                        <p:outputLabel value="#{pedidoBean.pedido.estacionServicio.nombre}"
+                                       styleClass="texto_negrita"
+                                       rendered="#{pedidoBean.pedido.idPedido ne null}"/>
+                        <p:selectOneMenu styleClass="full-width"
+                                         rendered="#{pedidoBean.pedido.idPedido eq null}"
+                                         id="slcEstacion" style="width: 100%;"
+                                         disabled="#{pedidoBean.pedido.terminal.idTerminal ne null}"
+                                         value="#{pedidoBean.pedido.estacionServicio.idEstacionServicio}"
+                                         required="true" requiredMessage="Estación: Campo obligatorio."
+                                         filter="true" filterMatchMode="startsWith">
                             <f:selectItem itemLabel="--Seleccione--" noSelectionOption="true"/>
                             <f:selectItems value="#{pedidoBean.estacionServicioLst}" var="estacion" itemLabel="#{estacion.nombre}" itemValue="#{estacion.idEstacionServicio}" />
                             <p:ajax event="change" process="@this" listener="#{pedidoBean.seleccionarEstacionServicio}" update="formulario:grMensajes, formulario:slcTerminal"/>
                         </p:selectOneMenu>
 
                         <p:outputLabel value="TERMINAL:" styleClass="texto_negrita"/>
-                        <p:selectOneMenu styleClass="full-width" id="slcTerminal" style="width: 100%;" disabled="#{pedidoBean.pedido.pedidoDetalleLst.size() > 0}" value="#{pedidoBean.pedido.terminal.idTerminal}" required="true" requiredMessage="Terminal: Campo obligatorio." filter="true" filterMatchMode="startsWith">
+                        <p:outputLabel value="#{pedidoBean.pedido.terminal.nombre}"
+                                       styleClass="texto_negrita"
+                                       rendered="#{pedidoBean.pedido.idPedido ne null}"/>
+                        <p:selectOneMenu styleClass="full-width" id="slcTerminal"
+                                         style="width: 100%;"
+                                         rendered="#{pedidoBean.pedido.idPedido eq null}"
+                                         disabled="#{pedidoBean.pedido.pedidoDetalleLst.size() > 0}"
+                                         value="#{pedidoBean.pedido.terminal.idTerminal}"
+                                         required="true" requiredMessage="Terminal: Campo obligatorio."
+                                         filter="true" filterMatchMode="startsWith">
                             <f:selectItem itemLabel="--Seleccione--" noSelectionOption="true"/>
-                            <f:selectItems value="#{pedidoBean.pedido.estacionServicio.terminalList}" var="terminal" itemLabel="#{terminal.nombre}" itemValue="#{terminal.idTerminal}" />
+                            <f:selectItems value="#{pedidoBean.pedido.estacionServicio.terminalList}" var="terminal" itemLabel="#{terminal.terminal.nombre}" itemValue="#{terminal.terminal.idTerminal}" />
                             <p:ajax event="change" process="@this" listener="#{pedidoBean.seleccionarTerminal}" update="formulario:grMensajes, formulario:flsMenu0003, formulario:slcEstacion"/>
                         </p:selectOneMenu>
 
@@ -135,7 +153,7 @@
                                  value="#{pedidoBean.pedido.pedidoEstadoOrderLst}">
                         <p:column headerText="Fecha">
                             <h:outputText value="#{estado.fechaRegistro}">
-                                <f:convertDateTime timeZone="#{parametrosApplication.timeZone}" pattern="#{parametrosApplication.formatoFechaHoraSMS}"/>
+                                <f:convertDateTime pattern="MM/dd/yyyy HH:mm:ss" type="localDate" />
                             </h:outputText>
                         </p:column>
                         <p:column headerText="Responsable">
@@ -195,6 +213,10 @@
                             <h:outputText value="#{product.impuestoTarifa.descripcion}" />
                         </p:column>
 
+                        <p:column headerText="Código">
+                            <h:outputText value="#{product.tipoCombustible.codigo}" />
+                        </p:column>
+
                         <p:column headerText="Producto">
                             <h:outputText value="#{product.tipoCombustible.nombre}" />
                         </p:column>
@@ -204,7 +226,7 @@
                             <h:outputText value="Industrial" rendered="#{product.tipoCombustible.tipo eq 2}"/>
                         </p:column>
 
-                        <p:column headerText="Cantidad"
+                        <p:column headerText="Volumen"
                                   style="text-align: right">
                             <p:cellEditor>
                                 <f:facet name="output">

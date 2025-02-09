@@ -1,10 +1,9 @@
-<ui:composition
-        xmlns="http://www.w3.org/1999/xhtml"
-        xmlns:h="jakarta.faces.html"
-        xmlns:ui="jakarta.faces.facelets"
-        xmlns:f="http://java.sun.com/jsf/core"
-        template="../templates/templateMenu.xhtml"
-        xmlns:p="primefaces">
+<ui:composition xmlns:h="jakarta.faces.html"
+                xmlns:p="primefaces"
+                xmlns:f="jakarta.faces.core"
+                xmlns:ui="jakarta.faces.facelets"
+                template="../templates/templateMenu.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml">
 
     <ui:define name="titulo">
         Camiones
@@ -54,7 +53,7 @@
                           sortBy="#{camion.codigo}"
                           filterBy="#{camion.codigo}"
                           filterPlaceholder="Código"
-                          width="15%">
+                          width="10%">
                     <h:outputText value="#{camion.codigo}"/>
                 </p:column>
 
@@ -63,22 +62,28 @@
                           sortBy="#{camion.placa}"
                           filterBy="#{camion.placa}"
                           filterPlaceholder="Placa"
-                          width="15%">
+                          width="10%">
                     <h:outputText value="#{camion.placa}"/>
                 </p:column>
 
                 <p:column headerText="Capacidad"
-                          width="10%">
+                          width="10%"
+                          style="text-align: right">
                     <h:outputText value="#{camion.capacidad}"/>
                 </p:column>
 
                 <p:column headerText="Compartimientos"
-                          width="10%">
+                          width="7%"
+                          style="text-align: right">
                     <h:outputText value="#{camion.compartimientos} "/>
                 </p:column>
 
                 <p:column headerText="Transportista">
-                    <h:outputText value="#{camion.persona.nombres} #{camion.persona.apellidos}"/>
+                    <h:outputText value="#{camion.transportista.persona.cedula} - #{camion.transportista.persona.nombreApellido} "/>
+                </p:column>
+
+                <p:column headerText="Conductor">
+                    <h:outputText value="#{camion.persona.cedula} - #{camion.persona.nombreApellido}"/>
                 </p:column>
 
                 <p:column headerText="Estado"
@@ -95,7 +100,7 @@
                   id="dlgCamionId"
                   widgetVar="dlgCamion"
                   minHeight="40"
-                  width="30%"
+                  width="35%"
                   showEffect="fade"
                   modal="true"
                   closeOnEscape="true">
@@ -103,6 +108,36 @@
             <h:panelGrid columns="2"
                          id="pnlDatosCamion"
                          width="90%">
+                <p:outputLabel value="Transportista"
+                               styleClass="texto_negrita"/>
+                <p:selectOneMenu value="#{camionBean.camion.transportista}"
+                                 styleClass="full-width"
+                                 converter="omnifaces.SelectItemsConverter"
+                                 var="c"
+                                 required="true"
+                                 requiredMessage="Selector Transportista: Campo Obligatorio"
+                                 filter="true"
+                                 filterMatchMode="startsWith"
+                                 filterNormalize="true">
+
+                    <f:selectItem itemLabel="--Seleccione--"
+                                  itemValue="" noSelectionOption="true"/>
+
+                    <f:selectItems value="#{camionBean.lstTransportista}"
+                                   var="country"
+                                   itemLabel="#{country.persona.cedula} #{country.persona.nombreApellido}"
+                                   itemValue="#{country}"/>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Transportista"/>
+                        </f:facet>
+                        <h:outputText value="Ruc: #{c.persona.cedula}"/><br/>
+                        <h:outputText value="Nom: #{c.persona.nombreApellido}"/><br/>
+                        <h:outputText value="Tel: #{c.persona.telefono}"/><br/>
+                        <h:outputText value="Cor: #{c.persona.email}"/>
+                    </p:column>
+                </p:selectOneMenu>
                 <p:outputLabel value="Código"
                                for="txtCodigo"
                                styleClass="texto_negrita"/>
@@ -143,7 +178,7 @@
                                decimalPlaces="0"
                                requiredMessage="Compartimientos: Campo obligatorio."/>
 
-                <p:outputLabel value="Transportista"
+                <p:outputLabel value="Conductor"
                                styleClass="texto_negrita"/>
                 <h:panelGrid columns="3" id="pnlTransportista">
                     <p:commandButton update="frmDialog:dlgEmpleadoId"
@@ -160,7 +195,7 @@
                                 update="formulario:grMensajes, txtTransportista"/>
                     </p:commandButton>
 
-                    <p:outputLabel value="#{camionBean.camion.persona.nombres} #{camionBean.camion.persona.apellidos}"
+                    <p:outputLabel value="#{camionBean.camion.persona.cedula} - #{camionBean.camion.persona.nombreApellido}"
                                    id="txtTransportista"/>
                 </h:panelGrid>
 

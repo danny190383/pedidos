@@ -1,7 +1,10 @@
 package com.std.ec.controller;
 
-import com.std.ec.entity.Pedido;
+import com.std.ec.dto.CupoPedidoDTO;
+import com.std.ec.entity.*;
+import com.std.ec.service.impl.IPedidoDetalleService;
 import com.std.ec.service.impl.IPedidoService;
+import com.std.ec.service.impl.ITerminalEstacionCupoService;
 import com.std.ec.util.FacesUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.view.ViewScoped;
@@ -14,10 +17,10 @@ import org.primefaces.model.SortMeta;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.TextStyle;
+import java.util.*;
 
 @Named("pedidosAdminBean")
 @ViewScoped
@@ -26,13 +29,19 @@ public class PedidosAdminBean implements Serializable {
 
 	@Autowired
     private IPedidoService pedidoService;
+    @Autowired
+    private IPedidoDetalleService pedidoDetalleService;
+    @Autowired
+    private ITerminalEstacionCupoService terminalEstacionCupoService;
 
     private LazyDataModel<Pedido> lazyModel;
     private List<Pedido> datasource;
     private Pedido pedidoSelected;
+    private List<CupoPedidoDTO> cupoPedidoDTOList;
 
     public PedidosAdminBean() {
         this.pedidoSelected = new Pedido();
+        this.cupoPedidoDTOList = new ArrayList<>();
     }
 
     @PostConstruct
@@ -102,11 +111,20 @@ public class PedidosAdminBean implements Serializable {
         }
     }
 
+    public void onRowSelect(SelectEvent<Pedido> event) {
+        pedidoSelected = pedidoService.findAllWithDetalle(event.getObject().getIdPedido());
+    }
+
     public void chooseCheque() {
         if(pedidoSelected == null){
             FacesUtils.addWarMessage("Debe seleccionar un pedido.");
             return;
         }
+        //validar cupo y si no tiene cupo enviar correo
+        for(PedidoDetalle detalle : pedidoSelected.getPedidoDetalleLst()){
+            pedidoDetalleService.validarCupoPedido(detalle);
+        }
+
         Map<String, Object> options = new HashMap<>();
         options.put("resizable", false);
         options.put("draggable", false);
@@ -114,6 +132,41 @@ public class PedidosAdminBean implements Serializable {
         Map<String, List<String>> params = new HashMap<>();
         params.put("pedido", Arrays.asList(pedidoSelected.getIdPedido().toString()));
         PrimeFaces.current().dialog().openDynamic("/extraDialog/cheque", options, params);
+    }
+
+    public void cargarCupos(){
+        cupoPedidoDTOList.clear();
+        for(PedidoDetalle pedidoDetalle : pedidoSelected.getPedidoDetalleLst()){
+            LocalDate fechaPedido = pedidoDetalle.getPedido().getFechaRegistro().toLocalDate();
+            String mesAnio = fechaPedido.getYear() + " - " + fechaPedido.getMonth().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es"));
+            TipoCombustible tipoCombustible = pedidoDetalle.getTipoCombustible();
+            EstacionServicio estacionServicio = pedidoDetalle.getPedido().getEstacionServicio();
+            Terminal terminal = pedidoDetalle.getPedido().getTerminal();
+            TerminalEstacionCupo cupo = terminalEstacionCupoService.findByTerminalAndEstacionServicioAndTipoCombustibleAndCupoMensual(
+                    terminal,
+                    estacionServicio,
+                    tipoCombustible,
+                    mesAnio);
+            CupoPedidoDTO cupoPedidoDTO = new CupoPedidoDTO();
+            cupoPedidoDTO.setTipoCombustible(pedidoDetalle.getTipoCombustible());
+            cupoPedidoDTO.setVolumenSolicitado(pedidoDetalle.getVolumen());
+            if (cupo != null) {
+                cupoPedidoDTO.setCupoDiario(cupo.getCupoDiario());
+                cupoPedidoDTO.setCupoMensual(cupo.getCupoMensual());
+                cupoPedidoDTO.setMes(cupo.getMes());
+            }else{
+                cupoPedidoDTO.setCupoDiario(BigDecimal.ZERO);
+                cupoPedidoDTO.setCupoMensual(BigDecimal.ZERO);
+            }
+            cupoPedidoDTO.setCupoMesAcumulado(pedidoDetalleService.sumarVolumenDespachadoPorEstacionTerminalYCombustible(
+                    estacionServicio,
+                    terminal,
+                    tipoCombustible,
+                    fechaPedido.getYear(),
+                    fechaPedido.getMonthValue(),
+                    Pedido.DESPACHADO));
+            cupoPedidoDTOList.add(cupoPedidoDTO);
+        }
     }
 
     public void onChequeChosen(SelectEvent event) {
@@ -166,7 +219,7 @@ public class PedidosAdminBean implements Serializable {
         options.put("resizable", false);
         options.put("draggable", false);
         options.put("modal", true);
-        options.put("width", "50%");
+        options.put("width", "65%");
         options.put("contentWidth","100%");
         Map<String, List<String>> params = new HashMap<>();
         params.put("pedido", Arrays.asList(pedidoSelected.getIdPedido().toString()));
@@ -190,5 +243,13 @@ public class PedidosAdminBean implements Serializable {
 
     public void setPedidoSelected(Pedido pedidoSelected) {
         this.pedidoSelected = pedidoSelected;
+    }
+
+    public List<CupoPedidoDTO> getCupoPedidoDTOList() {
+        return cupoPedidoDTOList;
+    }
+
+    public void setCupoPedidoDTOList(List<CupoPedidoDTO> cupoPedidoDTOList) {
+        this.cupoPedidoDTOList = cupoPedidoDTOList;
     }
 }

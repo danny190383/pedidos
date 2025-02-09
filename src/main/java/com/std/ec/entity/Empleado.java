@@ -26,10 +26,10 @@ public class Empleado implements Serializable {
     @OneToOne(optional = false, cascade = CascadeType.MERGE)
     private Persona persona;
     @JoinColumn(name = "id_terminal", referencedColumnName = "id_terminal")
-    @OneToOne(optional = true)
+    @ManyToOne(optional = true)
     private Terminal terminal;
     @JoinColumn(name = "id_estacion_servicio", referencedColumnName = "id_estacion_servicio")
-    @OneToOne(optional = true)
+    @ManyToOne(optional = true)
     private EstacionServicio estacionServicio;
     @OneToOne(mappedBy = "empleado", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Usuario usuario;

@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Data
@@ -21,8 +21,7 @@ public class PedidoEstado implements Serializable {
     @Column(name = "id_pedido_estado")
     private Long idPedidoEstado;
     @Column(name = "fecha_registro")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date fechaRegistro;
+    private LocalDateTime fechaRegistro;
     @Column(name = "detalle")
     private String detalle;
     @JoinColumn(name = "id_pedido", referencedColumnName = "id_pedido")

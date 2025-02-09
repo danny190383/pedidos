@@ -118,31 +118,31 @@
                         </f:facet>
 
                         <p:column headerText="Ruc">
-                            <h:outputText value="#{estacion.ruc}"/>
+                            <h:outputText value="#{estacion.estacionServicio.ruc}"/>
                         </p:column>
 
                         <p:column headerText="Código">
-                            <h:outputText value="#{estacion.codigo}"/>
+                            <h:outputText value="#{estacion.estacionServicio.codigo}"/>
                         </p:column>
 
                         <p:column headerText="Estacion de Servicio">
-                            <h:outputText value="#{estacion.nombre}"/>
+                            <h:outputText value="#{estacion.estacionServicio.nombre}"/>
                         </p:column>
 
                         <p:column headerText="Responsable">
-                            <h:outputText value="#{estacion.responsable.persona.nombreApellido}"/>
+                            <h:outputText value="#{estacion.estacionServicio.responsable.persona.nombreApellido}"/>
                         </p:column>
 
                         <p:column headerText="Provincia">
-                            <h:outputText value="#{estacion.parroquia.canton.provincia.descripcion}"/>
+                            <h:outputText value="#{estacion.estacionServicio.parroquia.canton.provincia.descripcion}"/>
                         </p:column>
 
                         <p:column headerText="Cantón">
-                            <h:outputText value="#{estacion.parroquia.canton.descripcion}"/>
+                            <h:outputText value="#{estacion.estacionServicio.parroquia.canton.descripcion}"/>
                         </p:column>
 
                         <p:column headerText="Parroquia">
-                            <h:outputText value="#{estacion.parroquia.descripcion}"/>
+                            <h:outputText value="#{estacion.estacionServicio.parroquia.descripcion}"/>
                         </p:column>
                     </p:dataTable>
                 </p:rowExpansion>

@@ -62,7 +62,7 @@ public class TerminalesBean implements Serializable {
     public void init(){
         try {
             this.nuevoRegistro = false;
-            this.listTerminales = this.terminalService.listar();
+            this.listTerminales = this.terminalService.findAllWithRelations();
             this.listaProvincias = this.provinciaService.listar(Optional.of("1"));
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -173,14 +173,18 @@ public class TerminalesBean implements Serializable {
     public void onEstacionServicioChosen(SelectEvent event) {
         EstacionServicio estacion = (EstacionServicio) event.getObject();
         if(estacion != null){
-            if(!this.terminal.getEstacionServicioList().contains(estacion)){
-                this.terminal.getEstacionServicioList().add(estacion);
+        	TerminalEstacion terminalEstacion = new TerminalEstacion(); 
+        	try {
+        		terminalEstacion.setEstacionServicio(estacion);
+        		terminalEstacion.setTerminal(terminal);
+        		this.terminal.getEstacionServicioList().add(terminalEstacion);
                 this.terminalService.guardarTerminal(this.terminal);
                 this.init();
                 FacesUtils.addInfoMessage("Registro guardado.");
-            }else{
+			} catch (Exception e) {
+                this.terminal.getEstacionServicioList().remove(terminalEstacion);
                 FacesUtils.addErrorMessage("La estacion de servicio ya existe.");
-            }
+			}
         }
     }
 

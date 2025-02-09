@@ -15,8 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.Map;
+import java.util.*;
 
 @Named("chequeBean")
 @ViewScoped
@@ -43,7 +42,7 @@ public class ChequeBean implements Serializable {
         Map<String, String> params = context.getExternalContext().getRequestParameterMap();
         String pedidoId = params.get("pedido");
         if (pedidoId != null && !pedidoId.isEmpty()) {
-            pedido = pedidoService.findPedidoById(Long.parseLong(pedidoId));
+            pedido = pedidoService.findAllWithRelations(Long.parseLong(pedidoId));
         } else {
             System.out.println("El parámetro 'pedido' es nulo o vacío.");
         }
@@ -51,7 +50,9 @@ public class ChequeBean implements Serializable {
     }
 
     public void seleccionar(int index){
-        this.cheque = this.pedido.getPedidoChequeLst().get(index);
+        List<Cheque> chequeList = new ArrayList<>(this.pedido.getPedidoChequeLst());
+        this.cheque = chequeList.get(index);
+        //this.cheque = this.pedido.getPedidoChequeLst().get(index);
         this.index = index;
         this.editando = true;
     }
@@ -64,7 +65,15 @@ public class ChequeBean implements Serializable {
             cheque.setEstado(true);
             pedido.getPedidoChequeLst().add(cheque);
         }else{
-            pedido.getPedidoChequeLst().set(index, cheque);
+        	Cheque chequeAnterior = pedido.getPedidoChequeLst().stream()
+                    .filter(c -> c.getIdCheque().equals(cheque.getIdCheque())) 
+                    .findFirst()
+                    .orElse(null);
+
+            if (chequeAnterior != null) {
+                pedido.getPedidoChequeLst().remove(chequeAnterior); 
+            }
+            pedido.getPedidoChequeLst().add(cheque);
         }
         this.cheque = new Cheque();
         this.editando = false;
@@ -79,7 +88,7 @@ public class ChequeBean implements Serializable {
             if(!pedido.estaChequeGenerado()){
                 PedidoEstado pedidoEstado = new PedidoEstado();
                 pedidoEstado.setPedido(pedido);
-                pedidoEstado.setFechaRegistro(new Date());
+                pedidoEstado.setFechaRegistro(LocalDateTime.now());
                 pedidoEstado.setUsuarioRegistra(userSession.getUsuario());
                 pedidoEstado.setEstadoPedido(new EstadoPedido(Pedido.CHEQUE_GENERADO));
                 pedido.getPedidoEstadoLst().add(pedidoEstado);

@@ -33,10 +33,18 @@ public class PersonaService implements IPersonaService {
     }
 
     @Override
+    public void eliminarPersona(Persona persona){
+        personaRepository.delete(persona);
+    }
+
+    @Override
     public List<Persona> getPersonas(int first, int pageSize, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy) {
+
+        // Configurar ordenamiento dinámico con valores predeterminados
+        Sort sort = Sort.by(Sort.Order.asc("nombres"), Sort.Order.asc("apellidos"));
         // Configurar ordenamiento dinámico
-        Sort sort = Sort.unsorted();
         if (sortBy != null && !sortBy.isEmpty()) {
+            sort = Sort.unsorted();
             for (SortMeta meta : sortBy.values()) {
                 String field = meta.getField();
                 Sort.Order order = meta.getOrder() == SortOrder.ASCENDING

@@ -38,16 +38,15 @@ public class PedidoDetalle  implements Serializable {
     private ImpuestoTarifa impuestoTarifa;
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        PedidoDetalle that = (PedidoDetalle) o;
-        return Objects.equals(idPedidoDetalle, that.idPedidoDetalle);
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        PedidoDetalle that = (PedidoDetalle) obj;
+        return Objects.equals(this.tipoCombustible, that.tipoCombustible);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idPedidoDetalle);
+        return Objects.hash(tipoCombustible);
     }
-
 }

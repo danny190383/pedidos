@@ -1,0 +1,250 @@
+<ui:composition
+        xmlns:h="jakarta.faces.html"
+        xmlns:f="jakarta.faces.core"
+        xmlns:ui="jakarta.faces.facelets"
+        xmlns:p="http://primefaces.org/ui"
+        template="../templates/templateMenu.xhtml">
+
+    <ui:define name="titulo">
+        Cupos
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="ADMINISTRACIÓN CUPOS"
+                 styleClass="custom-panel">
+            <p:toolbar>
+                <p:toolbarGroup>
+                    <h:panelGrid columns="5">
+                        <p:outputLabel value="TERMINAL:" styleClass="texto_negrita"/>
+                        <p:selectOneMenu styleClass="full-width" id="slcTerminal"
+                                         value="#{terminalCupoBean.idTerminal}"
+                                         filter="true" filterMatchMode="startsWith">
+                            <f:selectItem itemLabel="--Seleccione--" noSelectionOption="true"/>
+                            <f:selectItems value="#{terminalCupoBean.listTerminales}"
+                                           var="terminal"
+                                           itemLabel="#{terminal.nombre}"
+                                           itemValue="#{terminal.idTerminal}" />
+                            <p:ajax event="change" process="@this"
+                                    listener="#{terminalCupoBean.seleccionarTerminal}"
+                                    update="formulario:tblEstacionServicio, formulario:slcEstacion, formulario:tblCuposPrincipal"/>
+                        </p:selectOneMenu>
+                        <p:spacer width="10px"/>
+                        <p:outputLabel value="ESTACIÓN DE SERVICIO:" styleClass="texto_negrita"/>
+                        <p:selectOneMenu styleClass="full-width"
+                                         id="slcEstacion"
+                                         value="#{terminalCupoBean.idTerminalEstacion}"
+                                         filter="true" filterMatchMode="startsWith">
+                            <f:selectItem itemLabel="--Seleccione--" noSelectionOption="true"/>
+                            <f:selectItems value="#{terminalCupoBean.listEstacionServicios}"
+                                           var="estacion"
+                                           itemLabel="#{estacion.estacionServicio.nombre}"
+                                           itemValue="#{estacion.idTerminalEstacion}" />
+                            <p:ajax process="@this"
+                                    listener="#{terminalCupoBean.seleccionarTerminalEstacion()}"
+                                    update="@this, formulario:slcEstacion, formulario:tblCuposPrincipal"/>
+                        </p:selectOneMenu>
+                    </h:panelGrid>
+                </p:toolbarGroup>
+            </p:toolbar>
+            <br/>
+
+            <p:dataTable var="cupo"
+                         id="tblCuposPrincipal"
+                         rowIndexVar="index"
+                         value="#{terminalCupoBean.terminalEstacionSlc.terminalEstacionCupoLst}">
+
+                <f:facet name="header">
+                    <p:commandButton icon="pi pi-external-link"
+                                     value="Nuevo"
+                                     disabled="#{terminalCupoBean.idTerminalEstacion eq null}"
+                                     update="frmDialog:dlgEstacionServicioId"
+                                     oncomplete="PF('dlgEstacionServicio').show()"
+                                     process="@this"
+                                     action="#{terminalCupoBean.nuevoTerminalEstacionCupo()}"/>
+                </f:facet>
+
+                <p:column headerText="Opciones"
+                          width="5%">
+                    <h:panelGroup styleClass="botonera-opciones">
+                        <p:commandButton icon="pi pi-pencil"
+                                         styleClass="rounded-button ui-button-outlined"
+                                         update="frmDialog:dlgEstacionServicioId"
+                                         oncomplete="PF('dlgEstacionServicio').show()"
+                                         process="tblCuposPrincipal"
+                                         action="#{terminalCupoBean.seleccionarCupo(index)}"/>
+                    </h:panelGroup>
+                </p:column>
+
+                <p:column headerText="Mes"
+                          sortBy="#{cupo.mes}"
+                          filterBy="#{cupo.mes}"
+                          filterMatchMode="contains"
+                          filterPlaceholder="Mes">
+                    <h:outputText value="#{cupo.mes}" />
+                </p:column>
+
+                <p:column headerText="Tipo"
+                          sortBy="#{cupo.tipoCombustible.nombre}"
+                          filterBy="#{cupo.tipoCombustible.nombre}"
+                          filterMatchMode="contains"
+                          filterPlaceholder="Nombre">
+                    <h:outputText value="#{cupo.tipoCombustible.nombre} - #{cupo.tipoCombustible.tipo eq '1' ? 'Automotriz' : 'Industrial'}" />
+                </p:column>
+
+                <p:column headerText="Cupo Mensual"
+                          style="text-align: right">
+                    <h:outputText value="#{cupo.cupoMensual}" />
+                </p:column>
+
+                <p:column headerText="Cupo Diario"
+                          style="text-align: right">
+                    <h:outputText value="#{cupo.cupoDiario}" />
+                </p:column>
+
+                <p:column headerText="% Mercado"
+                          style="text-align: right">
+                    <h:outputText value="#{cupo.porcentajeMercado}" />
+                </p:column>
+
+                <p:column headerText="Volumen Diario"
+                          style="text-align: right">
+                    <h:outputText value="#{cupo.volumenDiario}" />
+                </p:column>
+
+                <p:column headerText="Volumen Semanal"
+                          style="text-align: right">
+                    <h:outputText value="#{cupo.volumenSemanal}" />
+                </p:column>
+
+                <p:column headerText="Volumen Mensual"
+                          style="text-align: right">
+                    <h:outputText value="#{cupo.volumenMensual}" />
+                </p:column>
+            </p:dataTable>
+        </p:panel>
+    </ui:define>
+    <ui:define name="dialog">
+        <p:dialog header="Cupos por Estación de Servicio"
+                  id="dlgEstacionServicioId"
+                  widgetVar="dlgEstacionServicio"
+                  minHeight="40"
+                  width="30%"
+                  showEffect="fade"
+                  modal="true"
+                  closeOnEscape="true">
+
+            <p:fieldset legend="Cupo">
+                <h:panelGrid columns="2"
+                             width="100%"
+                             id="pnlDatosCupo"
+                             columnClasses="columnaPequeña,columnaNumeros">
+                    <p:outputLabel value="Tipo Combustible:"
+                                   styleClass="texto_negrita"
+                                   for="slcTipoC"/>
+                    <p:selectOneMenu styleClass="full-width"
+                                     style="width: 100%;"
+                                     id="slcTipoC"
+                                     required="true"
+                                     disabled="#{terminalCupoBean.editando}"
+                                     requiredMessage="Tipo Combustible: Campo requerido."
+                                     value="#{terminalCupoBean.terminalEstacionCupo.tipoCombustible.idTipoCombustible}"
+                                     filter="true" filterMatchMode="startsWith"
+                                     converter="omnifaces.SelectItemsConverter">
+                        <f:selectItem itemLabel="--Seleccione--"
+                                      itemValue="" noSelectionOption="true"/>
+                        <f:selectItems value="#{terminalCupoBean.listTipoCombustible}"
+                                       var="tipoC"
+                                       itemLabel="#{tipoC.nombre}"
+                                       itemValue="#{tipoC.idTipoCombustible}" />
+                    </p:selectOneMenu>
+
+                    <p:outputLabel value="Mes :"
+                                   styleClass="texto_negrita"
+                                   for="slcMes"/>
+                    <p:selectOneMenu required="true"
+                                     id="slcMes"
+                                     styleClass="full-width"
+                                     requiredMessage="Mes: Campo requerido."
+                                     style="width: 100%;"
+                                     value="#{terminalCupoBean.terminalEstacionCupo.mes}">
+                        <f:selectItems value="#{terminalCupoBean.meses}"
+                                       var="mes"
+                                       itemLabel="#{terminalCupoBean.currentYear} - #{mes}"
+                                       itemValue="#{terminalCupoBean.currentYear} - #{mes}"/>
+
+                        <p:ajax update="frmDialog:txtCupoDia,frmDialog:txtVolumenD, frmDialog:txtVolumenS, frmDialog:txtVolumenM"
+                                event="change"
+                                process="@this, frmDialog:pnlDatosCupo"
+                                listener="#{terminalCupoBean.calcularCupoDia}"/>
+                    </p:selectOneMenu>
+
+                    <p:outputLabel value="Cupo Mensual:"
+                                   styleClass="texto_negrita"
+                                   for="txtCupoMes"/>
+                    <p:inputNumber value="#{terminalCupoBean.terminalEstacionCupo.cupoMensual}"
+                                   decimalPlaces="2"
+                                   rendered="true"
+                                   inputStyle="width:100%;text-align: right"
+                                   id="txtCupoMes">
+                        <p:ajax update="frmDialog:txtCupoDia,frmDialog:txtVolumenD, frmDialog:txtVolumenS, frmDialog:txtVolumenM"
+                                event="change"
+                                process="@this, frmDialog:pnlDatosCupo"
+                                listener="#{terminalCupoBean.calcularCupoDia}"/>
+                    </p:inputNumber>
+
+                    <p:outputLabel value="Cupo Diario:"
+                                   styleClass="texto_negrita"/>
+                    <p:outputLabel value="#{terminalCupoBean.terminalEstacionCupo.cupoDiario}"
+                                   styleClass="texto_negrita"
+                                   id="txtCupoDia"/>
+
+                    <p:outputLabel value="% de Mercado:"
+                                   styleClass="texto_negrita"
+                                   for="txtMercado"/>
+                    <p:inputNumber value="#{terminalCupoBean.terminalEstacionCupo.porcentajeMercado}"
+                                   decimalPlaces="2"
+                                   rendered="true"
+                                   inputStyle="width:100%;text-align: right"
+                                   id="txtMercado">
+                        <p:ajax update="frmDialog:txtVolumenD, frmDialog:txtVolumenS, frmDialog:txtVolumenM"
+                                listener="#{terminalCupoBean.calcularVolumenes}"/>
+                    </p:inputNumber>
+
+                    <p:outputLabel value="Volumen Diario:"
+                                   styleClass="texto_negrita"/>
+                    <p:outputLabel value="#{terminalCupoBean.terminalEstacionCupo.volumenDiario}"
+                                   styleClass="texto_negrita"
+                                   id="txtVolumenD"/>
+
+                    <p:outputLabel value="Volumen Semanal:"
+                                   styleClass="texto_negrita"/>
+                    <p:outputLabel value="#{terminalCupoBean.terminalEstacionCupo.volumenSemanal}"
+                                   styleClass="texto_negrita"
+                                   id="txtVolumenS"/>
+
+                    <p:outputLabel value="Volumen Mensual:"
+                                   styleClass="texto_negrita"/>
+                    <p:outputLabel value="#{terminalCupoBean.terminalEstacionCupo.volumenMensual}"
+                                   styleClass="texto_negrita"
+                                   id="txtVolumenM">
+
+                    </p:outputLabel>
+                </h:panelGrid>
+            </p:fieldset>
+            <br/>
+            <h:panelGrid columns="3" style="margin: 0 auto">
+                <p:commandButton value="Guardar"
+                                 actionListener="#{terminalCupoBean.agregarCupo}"
+                                 icon="pi pi-save"
+                                 process="@this, frmDialog:pnlDatosCupo"
+                                 update="frmDialog:pnlDatosCupo, formulario:tblCuposPrincipal,formulario:grMensajes"/>
+                <p:spacer width="5"/>
+                <p:commandButton value="Cancelar"
+                                 icon="pi pi-times"
+                                 process="@this"
+                                 update="@form"
+                                 oncomplete="PF('dlgEstacionServicio').hide()"/>
+            </h:panelGrid>
+        </p:dialog>
+    </ui:define>
+</ui:composition>
