@@ -19,9 +19,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class PedidoService implements IPedidoService {
@@ -217,39 +217,36 @@ public class PedidoService implements IPedidoService {
                     Object value = filter.getValue().getFilterValue();
 
                     if (value != null) {
-                        String[] fieldParts = field.split("\\.");
                         Path<?> path = root;
+                        String[] fieldParts = field.split("\\.");
                         for (String part : fieldParts) {
                             path = path.get(part);
                         }
 
-                        // Verificar si el campo es de tipo LocalDateTime
-                        if (path.getJavaType() == LocalDateTime.class) {
-                            // Convertir el valor de filtro (String) a LocalDate
-                            try {
-                                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                                LocalDate fechaFiltro = LocalDate.parse(value.toString(), formatter);
+                        if (field.equals("fechaRegistro") && value instanceof List<?>) {
+                            List<?> valores = (List<?>) value;
+                            if (valores.size() == 2 && valores.get(0) instanceof LocalDate && valores.get(1) instanceof LocalDate) {
+                                LocalDate fechaDesde = (LocalDate) valores.get(0);
+                                LocalDate fechaHasta = (LocalDate) valores.get(1);
 
-                                // Extraer la fecha del campo LocalDateTime en la base de datos
-                                Expression<LocalDate> fechaCampo = criteriaBuilder.function(
-                                        "DATE", // Función de la base de datos para extraer la fecha
-                                        LocalDate.class,
-                                        path
-                                );
-
-                                // Comparar solo la parte de la fecha
                                 predicate = criteriaBuilder.and(predicate,
-                                        criteriaBuilder.equal(fechaCampo, fechaFiltro));
-                            } catch (DateTimeParseException e) {
-                                throw new IllegalArgumentException("Formato de fecha inválido: " + value.toString(), e);
+                                        criteriaBuilder.between(root.get("fechaRegistro"), fechaDesde.atStartOfDay(), fechaHasta.atTime(23, 59, 59))
+                                );
                             }
-                        } else {
-                            // Si no es una fecha, aplicar lower() como antes
+                        }
+
+                        if (field.equals("estadoPrioritario") && value != null) {
+                        	Path<Long> estadoPrioritarioId = root.get("estadoPrioritario").get("idEstadoPedido");
+                            predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(estadoPrioritarioId, value));
+                        }
+
+                        if (!field.equals("fechaRegistro") && !field.equals("estadoPrioritario")) {
                             predicate = criteriaBuilder.and(predicate,
                                     criteriaBuilder.like(
                                             criteriaBuilder.lower(path.as(String.class)),
                                             "%" + value.toString().toLowerCase() + "%"
-                                    ));
+                                    )
+                            );
                         }
                     }
                 }
@@ -262,22 +259,22 @@ public class PedidoService implements IPedidoService {
 
     @Override
     public List<Pedido> getPedidosTodos(int first, int pageSize, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy) {
-        // Configurar ordenamiento dinámico
         Sort sort = Sort.unsorted();
+
         if (sortBy != null && !sortBy.isEmpty()) {
+            List<Sort.Order> orders = new ArrayList<>();
             for (SortMeta meta : sortBy.values()) {
                 String field = meta.getField();
                 Sort.Order order = meta.getOrder() == SortOrder.ASCENDING
                         ? Sort.Order.asc(field)
                         : Sort.Order.desc(field);
-                sort = sort.and(Sort.by(order));
+                orders.add(order);
             }
+            sort = Sort.by(orders);
         }
 
-        // Configurar paginación
         PageRequest pageRequest = PageRequest.of(first / pageSize, pageSize, sort);
 
-        // Construir filtros dinámicos
         Specification<Pedido> specification = (root, query, criteriaBuilder) -> {
             Predicate predicate = criteriaBuilder.conjunction();
 
@@ -287,48 +284,44 @@ public class PedidoService implements IPedidoService {
                     Object value = filter.getValue().getFilterValue();
 
                     if (value != null) {
-                        // Manejar campos anidados con "persona.campo"
-                        String[] fieldParts = field.split("\\.");
                         Path<?> path = root;
+                        String[] fieldParts = field.split("\\.");
                         for (String part : fieldParts) {
                             path = path.get(part);
                         }
 
-                        // Verificar si el campo es de tipo LocalDateTime
-                        if (path.getJavaType() == LocalDateTime.class) {
-                            // Convertir el valor de filtro (String) a LocalDate
-                            try {
-                                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                                LocalDate fechaFiltro = LocalDate.parse(value.toString(), formatter);
+                        if (field.equals("fechaRegistro") && value instanceof List<?>) {
+                            List<?> valores = (List<?>) value;
+                            if (valores.size() == 2 && valores.get(0) instanceof LocalDate && valores.get(1) instanceof LocalDate) {
+                                LocalDate fechaDesde = (LocalDate) valores.get(0);
+                                LocalDate fechaHasta = (LocalDate) valores.get(1);
 
-                                // Extraer la fecha del campo LocalDateTime en la base de datos
-                                Expression<LocalDate> fechaCampo = criteriaBuilder.function(
-                                        "DATE", // Función de la base de datos para extraer la fecha
-                                        LocalDate.class,
-                                        path
-                                );
-
-                                // Comparar solo la parte de la fecha
                                 predicate = criteriaBuilder.and(predicate,
-                                        criteriaBuilder.equal(fechaCampo, fechaFiltro));
-                            } catch (DateTimeParseException e) {
-                                throw new IllegalArgumentException("Formato de fecha inválido: " + value.toString(), e);
+                                        criteriaBuilder.between(root.get("fechaRegistro"), fechaDesde.atStartOfDay(), fechaHasta.atTime(23, 59, 59))
+                                );
                             }
-                        } else {
-                            // Si no es una fecha, aplicar lower() como antes
+                        }
+
+                        if (field.equals("estadoPrioritario") && value != null) {
+                        	Path<Long> estadoPrioritarioId = root.get("estadoPrioritario").get("idEstadoPedido");
+                            predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(estadoPrioritarioId, value));
+                        }
+
+                        if (!field.equals("fechaRegistro") && !field.equals("estadoPrioritario")) {
                             predicate = criteriaBuilder.and(predicate,
                                     criteriaBuilder.like(
                                             criteriaBuilder.lower(path.as(String.class)),
                                             "%" + value.toString().toLowerCase() + "%"
-                                    ));
+                                    )
+                            );
                         }
                     }
                 }
             }
             return predicate;
         };
-        Page<Pedido> page = pedidoRepository.findAll(specification, pageRequest);
 
+        Page<Pedido> page = pedidoRepository.findAll(specification, pageRequest);
         return page.getContent();
     }
 }

@@ -12,6 +12,9 @@
 
     <h:body style="font-family: var(--font-family);">
         <h:form id="frmCheque">
+			<p:messages id="messages" closable="true">
+				<p:autoUpdate/>
+			</p:messages>
 			<h:panelGrid columns="2"
 						 style="margin-left: 5px; margin-right: 5px"
 						 columnClasses="topAligned,topAligned">
@@ -95,8 +98,11 @@
 
 						<p:outputLabel value="Razón Anulación:"
 									   styleClass="texto_negrita"
+									   for="slcRazon"
 									   rendered="#{not validarChequeBean.cheque.estado}"/>
-						<p:selectOneMenu styleClass="full-width" id="slcRazon" style="width: 100%;"
+						<p:selectOneMenu styleClass="full-width"
+										 id="slcRazon"
+										 style="width: 100%;"
 										 value="#{validarChequeBean.cheque.razonAnulacion.idRazonAnulacion}"
 										 required="true"
 										 requiredMessage="Razón Anulación: Campo obligatorio."

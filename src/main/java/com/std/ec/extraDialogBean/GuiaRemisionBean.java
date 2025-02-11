@@ -71,10 +71,11 @@ public class GuiaRemisionBean implements Serializable {
             if(!pedido.estaDespachado()){
                 PedidoEstado pedidoEstado = new PedidoEstado();
                 pedidoEstado.setPedido(pedido);
-                pedidoEstado.setFechaRegistro(new Date());
+                pedidoEstado.setFechaRegistro(LocalDateTime.now());
                 pedidoEstado.setUsuarioRegistra(userSession.getUsuario());
                 pedidoEstado.setEstadoPedido(new EstadoPedido(Pedido.DESPACHADO));
                 pedido.getPedidoEstadoLst().add(pedidoEstado);
+                pedido.setEstadoPrioritario(new EstadoPedido(Pedido.DESPACHADO));
             }
             PrimeFaces.current().dialog().closeDynamic(pedido);
         }else {

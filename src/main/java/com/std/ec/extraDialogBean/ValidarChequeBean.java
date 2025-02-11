@@ -66,18 +66,28 @@ public class ValidarChequeBean implements Serializable {
         if(cheque.getEstado()){
             cheque.setRazonAnulacion(null);
             cheque.setUsuarioAnula(null);
-            if(!pedido.estaChequeValidado()){
+            if(pedido.estaChequeGenerado()){
                 PedidoEstado pedidoEstado = new PedidoEstado();
                 pedidoEstado.setPedido(pedido);
                 pedidoEstado.setFechaRegistro(LocalDateTime.now());
                 pedidoEstado.setUsuarioRegistra(userSession.getUsuario());
                 pedidoEstado.setEstadoPedido(new EstadoPedido(Pedido.CHEQUE_VALIDADO));
                 pedido.getPedidoEstadoLst().add(pedidoEstado);
+                pedido.setEstadoPrioritario(new EstadoPedido(Pedido.CHEQUE_VALIDADO));
             }
         }else{
             cheque.setFechaAnula(LocalDateTime.now());
             cheque.setUsuarioAnula(userSession.getUsuario());
             cheque.setSecuencialBanco(null);
+            if(pedido.estaChequeGenerado()){
+                PedidoEstado pedidoEstado = new PedidoEstado();
+                pedidoEstado.setPedido(pedido);
+                pedidoEstado.setFechaRegistro(LocalDateTime.now());
+                pedidoEstado.setUsuarioRegistra(userSession.getUsuario());
+                pedidoEstado.setEstadoPedido(new EstadoPedido(Pedido.CHEQUE_ANULADO));
+                pedido.getPedidoEstadoLst().add(pedidoEstado);
+                pedido.setEstadoPrioritario(new EstadoPedido(Pedido.CHEQUE_ANULADO));
+            }
         }
         pedido.getPedidoChequeLst().removeIf(c -> c.getIdCheque().equals(cheque.getIdCheque())); 
         pedido.getPedidoChequeLst().add(cheque); 

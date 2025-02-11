@@ -21,7 +21,7 @@ public class PedidoDetalleService implements IPedidoDetalleService {
     private PedidoDetalleRepository pedidoDetalleRepository;
 
     @Override
-    public void validarCupoPedido(PedidoDetalle pedidoDetalle) {
+    public Boolean validarCupoPedido(PedidoDetalle pedidoDetalle) {
         LocalDate fechaPedido = pedidoDetalle.getPedido().getFechaRegistro().toLocalDate();
         String mesAnio = fechaPedido.getYear() + " - " + fechaPedido.getMonth().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es"));
         TipoCombustible tipoCombustible = pedidoDetalle.getTipoCombustible();
@@ -31,7 +31,7 @@ public class PedidoDetalleService implements IPedidoDetalleService {
         // Obtener cupo diario y mensual
         TerminalEstacionCupo cupo = terminalEstacionCupoRepository.findByTerminalAndEstacionServicioAndTipoCombustibleAndCupoMensual(terminal, estacionServicio, tipoCombustible, mesAnio);
         if (cupo == null) {
-            throw new IllegalArgumentException("No hay cupo registrado para: " + mesAnio);
+            return false;
         }
 
         BigDecimal cupoDiario = cupo.getCupoDiario();
@@ -40,15 +40,16 @@ public class PedidoDetalleService implements IPedidoDetalleService {
 
         // Validar cupo diario
         if (volumenSolicitado.compareTo(cupoDiario) > 0) {
-            throw new IllegalArgumentException("El volumen solicitado excede el cupo diario asignado");
+            return false;
         }
 
         BigDecimal volumenTotalMes = pedidoDetalleRepository.sumarVolumenDespachadoPorEstacionTerminalYCombustible(
                 estacionServicio, terminal, tipoCombustible, fechaPedido.getYear(), fechaPedido.getMonthValue(), Pedido.DESPACHADO);
 
         if (volumenTotalMes.add(volumenSolicitado).compareTo(cupoMensual) > 0) {
-            throw new IllegalArgumentException("El volumen solicitado excede el cupo mensual asignado");
+            return false;
         }
+        return true;
     }
 
     @Override

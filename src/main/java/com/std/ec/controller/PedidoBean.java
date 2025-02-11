@@ -18,10 +18,7 @@ import org.springframework.stereotype.Component;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Component("pedidoBean")
 @ViewScoped
@@ -64,6 +61,7 @@ public class PedidoBean implements Serializable {
 
     public void nuevoPedido(){
         pedido = new Pedido();
+        pedido.setEstadoPrioritario(new EstadoPedido(Pedido.GENERADO));
         pedido.setFechaRegistro(LocalDateTime.now());
         pedido.setCodigo(pedidoService.obtenerSiguienteCodigo().toString());
         pedido.setUsuarioRegistra(userSession.getUsuario());
@@ -143,10 +141,11 @@ public class PedidoBean implements Serializable {
                 pedidoEstado.setPedido(pedido);
                 pedidoEstado.setFechaRegistro(LocalDateTime.now());
                 pedidoEstado.setUsuarioRegistra(userSession.getUsuario());
-                pedidoEstado.setEstadoPedido(new EstadoPedido(1L));
+                pedidoEstado.setEstadoPedido(new EstadoPedido(Pedido.GENERADO));
                 pedido.getPedidoEstadoLst().add(pedidoEstado);
             }
             if(this.anulando){
+                pedido.setEstadoPrioritario(new EstadoPedido(Pedido.ANULADO));
                 pedido.getPedidoEstadoLst().add(pedidoEstadoAnulado);
             }
             pedidoService.guardarPedido(this.pedido);
@@ -214,11 +213,12 @@ public class PedidoBean implements Serializable {
     }
 
     public void choosePedido() {
-        DialogFrameworkOptions options = DialogFrameworkOptions.builder()
-                .resizable(false)
-                .draggable(false)
-                .modal(true)
-                .build();
+        Map<String, Object> options = new HashMap<>();
+        options.put("resizable", false);
+        options.put("draggable", false);
+        options.put("modal", true);
+        options.put("width", "65%");
+        options.put("contentWidth","100%");
         PrimeFaces.current().dialog().openDynamic("/busquedas/buscarPedido", options, null);
     }
 

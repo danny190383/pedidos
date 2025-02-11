@@ -37,6 +37,13 @@ public class PedidoEstado implements Serializable {
     @ManyToOne(optional = true)
     private RazonAnulacion razonAnulacion;
 
+    public final static Long GENERADO = 1L;
+    public final static Long CHEQUE_GENERADO = 2L;
+    public final static Long CHEQUE_VALIDADO = 7L;
+    public final static Long TRANSPORTE_ASIGNADO = 8L;
+    public final static Long ANULADO = 4L;
+    public final static Long DESPACHADO = 5L;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

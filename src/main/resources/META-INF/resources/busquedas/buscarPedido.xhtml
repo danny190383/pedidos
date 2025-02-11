@@ -41,6 +41,7 @@
 	
 	            <p:column headerText="Código"
 						  field="codigo"
+						  width="7%"
 	                      filterBy="#{pedido.codigo}"
 	                      sortBy="#{pedido.codigo}"
 	                      filterPlaceholder="Código">
@@ -64,14 +65,15 @@
 	            </p:column>
 	
 	            <p:column headerText="Total"
-						  style="text-align: right">
+						  style="text-align: right"
+						  width="7%">
 	                <h:outputText value="#{pedido.total}"/>
 	            </p:column>
 
 				<p:column headerText="Estado"
 						  width="7%"
 						  style="text-align: right">
-					<h:outputText value="#{pedido.obtenerEstadoPrioritario()}" />
+					<h:outputText value="#{pedido.estadoPrioritario.nombre}" />
 				</p:column>
 	
 	        </p:dataTable>

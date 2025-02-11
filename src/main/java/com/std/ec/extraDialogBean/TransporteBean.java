@@ -81,6 +81,7 @@ public class TransporteBean implements Serializable {
             pedidoEstado.setUsuarioRegistra(userSession.getUsuario());
             pedidoEstado.setEstadoPedido(new EstadoPedido(Pedido.TRANSPORTE_ASIGNADO));
             pedido.getPedidoEstadoLst().add(pedidoEstado);
+            pedido.setEstadoPrioritario(new EstadoPedido(Pedido.TRANSPORTE_ASIGNADO));
         }
         this.pedido.getPedidoCamionLst().forEach(caminoTmp -> caminoTmp.setEstado(Boolean.FALSE));
         this.pedido.getPedidoCamionLst().add(pedidoCamion);

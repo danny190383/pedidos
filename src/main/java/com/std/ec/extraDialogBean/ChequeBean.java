@@ -30,7 +30,6 @@ public class ChequeBean implements Serializable {
     private Pedido pedido;
     private Cheque cheque;
     private Boolean editando;
-    private int index;
 
     public ChequeBean() {
         cheque = new Cheque();
@@ -47,35 +46,57 @@ public class ChequeBean implements Serializable {
             System.out.println("El parámetro 'pedido' es nulo o vacío.");
         }
         this.editando = false;
+        this.nuevoCheque();
+    }
+
+    public void nuevoCheque(){
+        cheque = new Cheque();
+        cheque.setPedido(pedido);
+        cheque.setEstado(true);
+        cheque.setFechaRegistro(LocalDateTime.now());
+        cheque.setUsuarioRegistra(userSession.getUsuario());
     }
 
     public void seleccionar(int index){
         List<Cheque> chequeList = new ArrayList<>(this.pedido.getPedidoChequeLst());
         this.cheque = chequeList.get(index);
-        //this.cheque = this.pedido.getPedidoChequeLst().get(index);
-        this.index = index;
         this.editando = true;
     }
 
     public void agregarCheque() {
-        cheque.setFechaRegistro(LocalDateTime.now());
-        cheque.setUsuarioRegistra(userSession.getUsuario());
         if(!this.editando){
-            cheque.setPedido(pedido);
-            cheque.setEstado(true);
-            pedido.getPedidoChequeLst().add(cheque);
-        }else{
-        	Cheque chequeAnterior = pedido.getPedidoChequeLst().stream()
-                    .filter(c -> c.getIdCheque().equals(cheque.getIdCheque())) 
-                    .findFirst()
-                    .orElse(null);
-
-            if (chequeAnterior != null) {
-                pedido.getPedidoChequeLst().remove(chequeAnterior); 
+            if(pedido.estaGenerado()){
+                pedido.getPedidoChequeLst().add(cheque);
+                PedidoEstado pedidoEstado = new PedidoEstado();
+                pedidoEstado.setPedido(pedido);
+                pedidoEstado.setFechaRegistro(LocalDateTime.now());
+                pedidoEstado.setUsuarioRegistra(userSession.getUsuario());
+                pedidoEstado.setEstadoPedido(new EstadoPedido(Pedido.CHEQUE_GENERADO));
+                pedido.getPedidoEstadoLst().add(pedidoEstado);
+                pedido.setEstadoPrioritario(new EstadoPedido(Pedido.CHEQUE_GENERADO));
             }
-            pedido.getPedidoChequeLst().add(cheque);
+            if(pedido.estaChequeAnulado()){
+                if(pedido.getPedidoChequeLst().stream().anyMatch(cheque -> cheque.getEstado())){
+                    PedidoEstado pedidoEstado = new PedidoEstado();
+                    pedidoEstado.setPedido(pedido);
+                    pedidoEstado.setFechaRegistro(LocalDateTime.now());
+                    pedidoEstado.setUsuarioRegistra(userSession.getUsuario());
+                    pedidoEstado.setEstadoPedido(new EstadoPedido(Pedido.CHEQUE_GENERADO));
+                    pedido.getPedidoEstadoLst().add(pedidoEstado);
+                    pedido.setEstadoPrioritario(new EstadoPedido(Pedido.CHEQUE_GENERADO));
+                }
+            }
+        }else{
+			Cheque chequeAnterior = pedido.getPedidoChequeLst().stream()
+	                .filter(c -> c.getIdCheque().equals(cheque.getIdCheque()))
+	                .findFirst()
+	                .orElse(null);
+	        if (chequeAnterior != null) {
+	            pedido.getPedidoChequeLst().remove(chequeAnterior);
+	        }
+	        pedido.getPedidoChequeLst().add(cheque);
         }
-        this.cheque = new Cheque();
+        this.nuevoCheque();
         this.editando = false;
     }
     
@@ -84,14 +105,6 @@ public class ChequeBean implements Serializable {
             if(pedido.getPedidoChequeLst().isEmpty()){
                 FacesUtils.addErrorMessage("No ha registrado cheque.");
                 return;
-            }
-            if(!pedido.estaChequeGenerado()){
-                PedidoEstado pedidoEstado = new PedidoEstado();
-                pedidoEstado.setPedido(pedido);
-                pedidoEstado.setFechaRegistro(LocalDateTime.now());
-                pedidoEstado.setUsuarioRegistra(userSession.getUsuario());
-                pedidoEstado.setEstadoPedido(new EstadoPedido(Pedido.CHEQUE_GENERADO));
-                pedido.getPedidoEstadoLst().add(pedidoEstado);
             }
             PrimeFaces.current().dialog().closeDynamic(pedido);
         }else {

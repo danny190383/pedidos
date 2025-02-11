@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import java.math.BigDecimal;
 
 public interface IPedidoDetalleService {
-    void validarCupoPedido(PedidoDetalle pedidoDetalle);
+    Boolean validarCupoPedido(PedidoDetalle pedidoDetalle);
 
     BigDecimal sumarVolumenDespachadoPorEstacionTerminalYCombustible(
            EstacionServicio estacionServicio,

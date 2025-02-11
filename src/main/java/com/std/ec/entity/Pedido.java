@@ -49,6 +49,9 @@ public class Pedido implements Serializable {
     private Boolean turnoPrioritario;
     @Column(name = "turno_numero")
     private Integer turnoNumero;
+    @JoinColumn(name = "id_estado_pedido", referencedColumnName = "id_estado_pedido")
+    @ManyToOne(optional = false)
+    private EstadoPedido estadoPrioritario;
     @OneToMany(mappedBy = "pedido", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PedidoEstado> pedidoEstadoLst = new ArrayList<>();
     @OneToMany(mappedBy = "pedido", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -62,6 +65,7 @@ public class Pedido implements Serializable {
 
     public final static Long GENERADO = 1L;
     public final static Long CHEQUE_GENERADO = 2L;
+    public final static Long CHEQUE_ANULADO = 3L;
     public final static Long CHEQUE_VALIDADO = 7L;
     public final static Long TRANSPORTE_ASIGNADO = 8L;
     public final static Long ANULADO = 4L;
@@ -86,86 +90,31 @@ public class Pedido implements Serializable {
     }
 
     public Boolean estaGenerado() {
-        if (pedidoEstadoLst == null || pedidoEstadoLst.isEmpty()) {
-            return false;
-        }
-        return pedidoEstadoLst.stream()
-                .anyMatch(pedidoEstado -> pedidoEstado.getEstadoPedido() != null
-                        && pedidoEstado.getEstadoPedido().getIdEstadoPedido().equals(GENERADO));
+        return estadoPrioritario.getIdEstadoPedido().equals(GENERADO);
     }
 
     public Boolean estaChequeGenerado() {
-        if (pedidoEstadoLst == null || pedidoEstadoLst.isEmpty()) {
-            return false;
-        }
-        return pedidoEstadoLst.stream()
-                .anyMatch(pedidoEstado -> pedidoEstado.getEstadoPedido() != null
-                        && pedidoEstado.getEstadoPedido().getIdEstadoPedido().equals(CHEQUE_GENERADO));
+        return estadoPrioritario.getIdEstadoPedido().equals(CHEQUE_GENERADO);
+    }
+
+    public Boolean estaChequeAnulado() {
+        return estadoPrioritario.getIdEstadoPedido().equals(CHEQUE_ANULADO);
     }
 
     public Boolean estaChequeValidado() {
-        if (pedidoEstadoLst == null || pedidoEstadoLst.isEmpty()) {
-            return false;
-        }
-        return pedidoEstadoLst.stream()
-                .anyMatch(pedidoEstado -> pedidoEstado.getEstadoPedido() != null
-                        && pedidoEstado.getEstadoPedido().getIdEstadoPedido().equals(CHEQUE_VALIDADO));
+        return estadoPrioritario.getIdEstadoPedido().equals(CHEQUE_VALIDADO);
     }
 
     public Boolean estaTransporteAsignado() {
-        if (pedidoEstadoLst == null || pedidoEstadoLst.isEmpty()) {
-            return false;
-        }
-        return pedidoEstadoLst.stream()
-                .anyMatch(pedidoEstado -> pedidoEstado.getEstadoPedido() != null
-                        && pedidoEstado.getEstadoPedido().getIdEstadoPedido().equals(TRANSPORTE_ASIGNADO));
-    }
-
-    public Boolean estaFinanciero() {
-        if (pedidoEstadoLst == null || pedidoEstadoLst.isEmpty()) {
-            return false;
-        }
-        return pedidoEstadoLst.stream()
-                .anyMatch(pedidoEstado -> pedidoEstado.getEstadoPedido() != null
-                        && pedidoEstado.getEstadoPedido().getIdEstadoPedido() == 3L);
+        return estadoPrioritario.getIdEstadoPedido().equals(TRANSPORTE_ASIGNADO);
     }
 
     public Boolean estaAnulado() {
-        if (pedidoEstadoLst == null || pedidoEstadoLst.isEmpty()) {
-            return false;
-        }
-        return pedidoEstadoLst.stream()
-                .anyMatch(pedidoEstado -> pedidoEstado.getEstadoPedido() != null
-                        && pedidoEstado.getEstadoPedido().getIdEstadoPedido().equals(ANULADO));
+        return estadoPrioritario.getIdEstadoPedido().equals(ANULADO);
     }
 
     public Boolean estaDespachado() {
-        if (pedidoEstadoLst == null || pedidoEstadoLst.isEmpty()) {
-            return false;
-        }
-        return pedidoEstadoLst.stream()
-                .anyMatch(pedidoEstado -> pedidoEstado.getEstadoPedido() != null
-                        && pedidoEstado.getEstadoPedido().getIdEstadoPedido().equals(DESPACHADO));
-    }
-
-    public String obtenerEstadoPrioritario() {
-        if (estaAnulado()) {
-            return "Anulado";
-        } else if (estaDespachado()) {
-            return "Despachado";
-        } else if (estaFinanciero()) {
-            return "Financiero";
-        } else if (estaTransporteAsignado()) {
-            return "Transporte Asignado";
-        }else if (estaChequeValidado()) {
-            return "Cheque Validado";
-        } else if (estaChequeGenerado()) {
-            return "Cheque Generado";
-        } else if (estaGenerado()) {
-            return "Generado";
-        } else {
-            return "Sin Estado";
-        }
+        return estadoPrioritario.getIdEstadoPedido().equals(DESPACHADO);
     }
 
     @Override

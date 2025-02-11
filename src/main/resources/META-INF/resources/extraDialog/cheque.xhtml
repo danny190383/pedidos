@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:h="jakarta.faces.html"
-      xmlns:p="primefaces"
-	  xmlns:f="jakarta.faces.core">
+      xmlns:p="primefaces">
 
     <h:head>
         <title>Cheque</title>
@@ -12,6 +11,9 @@
 
     <h:body style="font-family: var(--font-family);">
         <h:form id="frmCheque">
+			<p:messages id="messages" closable="true">
+				<p:autoUpdate/>
+			</p:messages>
 			<h:panelGrid columns="2"
 						 style="margin-left: 5px; margin-right: 5px"
 						 columnClasses="topAligned,topAligned">
@@ -38,7 +40,8 @@
 									  id="txtFecha"/>
 
 						<p:outputLabel value="Beneficiario"
-									   styleClass="texto_negrita"/>
+									   styleClass="texto_negrita"
+									   for="txtBeneficiario"/>
 						<p:inputText value="#{chequeBean.cheque.beneficiario}"
 									 required="true"
 									 id="txtBeneficiario"
@@ -78,6 +81,7 @@
 								 
 						<p:column width="7%">
 							<p:commandButton icon="pi pi-pencil"
+											 disabled="#{not cheque.estado}"
 											 styleClass="rounded-button ui-button-outlined"
 											 update="frmCheque:pnlDatosCheque"
 											 process="tblCheques"

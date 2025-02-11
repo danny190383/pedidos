@@ -115,26 +115,11 @@ public class PedidosAdminBean implements Serializable {
         pedidoSelected = pedidoService.findAllWithDetalle(event.getObject().getIdPedido());
     }
 
-    public void chooseCheque() {
+    public void cargarCupos(){
         if(pedidoSelected == null){
             FacesUtils.addWarMessage("Debe seleccionar un pedido.");
             return;
         }
-        //validar cupo y si no tiene cupo enviar correo
-        for(PedidoDetalle detalle : pedidoSelected.getPedidoDetalleLst()){
-            pedidoDetalleService.validarCupoPedido(detalle);
-        }
-
-        Map<String, Object> options = new HashMap<>();
-        options.put("resizable", false);
-        options.put("draggable", false);
-        options.put("modal", true);
-        Map<String, List<String>> params = new HashMap<>();
-        params.put("pedido", Arrays.asList(pedidoSelected.getIdPedido().toString()));
-        PrimeFaces.current().dialog().openDynamic("/extraDialog/cheque", options, params);
-    }
-
-    public void cargarCupos(){
         cupoPedidoDTOList.clear();
         for(PedidoDetalle pedidoDetalle : pedidoSelected.getPedidoDetalleLst()){
             LocalDate fechaPedido = pedidoDetalle.getPedido().getFechaRegistro().toLocalDate();
@@ -169,6 +154,35 @@ public class PedidosAdminBean implements Serializable {
         }
     }
 
+    public void chooseCheque() {
+        if(pedidoSelected == null){
+            FacesUtils.addWarMessage("Debe seleccionar un pedido.");
+            return;
+        }
+        if( pedidoSelected.estaGenerado() ||
+            pedidoSelected.estaChequeGenerado() ||
+            pedidoSelected.estaChequeAnulado()){
+
+            for(PedidoDetalle detalle : pedidoSelected.getPedidoDetalleLst()){
+                if(!pedidoDetalleService.validarCupoPedido(detalle)){
+                    //correo
+                    FacesUtils.addWarMessage("Error en la asignación de cupo.");
+                    return;
+                }
+            }
+
+            Map<String, Object> options = new HashMap<>();
+            options.put("resizable", false);
+            options.put("draggable", false);
+            options.put("modal", true);
+            Map<String, List<String>> params = new HashMap<>();
+            params.put("pedido", Arrays.asList(pedidoSelected.getIdPedido().toString()));
+            PrimeFaces.current().dialog().openDynamic("/extraDialog/cheque", options, params);
+        }else{
+            FacesUtils.addWarMessage("El estado del pedido no permite generar un nuevo cheque.");
+        }
+    }
+
     public void onChequeChosen(SelectEvent event) {
         Pedido pedidoSlc = (Pedido) event.getObject();
         if(pedidoSlc != null){
@@ -179,13 +193,21 @@ public class PedidosAdminBean implements Serializable {
     }
 
     public void chooseValidarCheque() {
-        Map<String, Object> options = new HashMap<>();
-        options.put("resizable", false);
-        options.put("draggable", false);
-        options.put("modal", true);
-        Map<String, List<String>> params = new HashMap<>();
-        params.put("pedido", Arrays.asList(pedidoSelected.getIdPedido().toString()));
-        PrimeFaces.current().dialog().openDynamic("/extraDialog/validar_cheque", options, params);
+        if(pedidoSelected == null){
+            FacesUtils.addWarMessage("Debe seleccionar un pedido.");
+            return;
+        }
+        if(pedidoSelected.estaChequeGenerado()){
+            Map<String, Object> options = new HashMap<>();
+            options.put("resizable", false);
+            options.put("draggable", false);
+            options.put("modal", true);
+            Map<String, List<String>> params = new HashMap<>();
+            params.put("pedido", Arrays.asList(pedidoSelected.getIdPedido().toString()));
+            PrimeFaces.current().dialog().openDynamic("/extraDialog/validar_cheque", options, params);
+        }else{
+            FacesUtils.addWarMessage("El estado del pedido no permite validar un nuevo cheque.");
+        }
     }
 
     public void onValidarChequeChosen(SelectEvent event) {
@@ -196,15 +218,23 @@ public class PedidosAdminBean implements Serializable {
     }
 
     public void chooseTransporte() {
-        Map<String, Object> options = new HashMap<>();
-        options.put("resizable", false);
-        options.put("draggable", false);
-        options.put("modal", true);
-        options.put("width", "60%");
-        options.put("contentWidth","100%");
-        Map<String, List<String>> params = new HashMap<>();
-        params.put("pedido", Arrays.asList(pedidoSelected.getIdPedido().toString()));
-        PrimeFaces.current().dialog().openDynamic("/extraDialog/transporte", options, params);
+        if(pedidoSelected == null){
+            FacesUtils.addWarMessage("Debe seleccionar un pedido.");
+            return;
+        }
+        if(pedidoSelected.estaChequeValidado()){
+            Map<String, Object> options = new HashMap<>();
+            options.put("resizable", false);
+            options.put("draggable", false);
+            options.put("modal", true);
+            options.put("width", "65%");
+            options.put("contentWidth","100%");
+            Map<String, List<String>> params = new HashMap<>();
+            params.put("pedido", Arrays.asList(pedidoSelected.getIdPedido().toString()));
+            PrimeFaces.current().dialog().openDynamic("/extraDialog/transporte", options, params);
+        }else{
+            FacesUtils.addWarMessage("El estado del pedido no permite asignar transporte.");
+        }
     }
 
     public void onTransporteChosen(SelectEvent event) {
@@ -215,15 +245,23 @@ public class PedidosAdminBean implements Serializable {
     }
 
     public void chooseGuia() {
-        Map<String, Object> options = new HashMap<>();
-        options.put("resizable", false);
-        options.put("draggable", false);
-        options.put("modal", true);
-        options.put("width", "65%");
-        options.put("contentWidth","100%");
-        Map<String, List<String>> params = new HashMap<>();
-        params.put("pedido", Arrays.asList(pedidoSelected.getIdPedido().toString()));
-        PrimeFaces.current().dialog().openDynamic("/extraDialog/guia_remision", options, params);
+        if(pedidoSelected == null){
+            FacesUtils.addWarMessage("Debe seleccionar un pedido.");
+            return;
+        }
+        if(pedidoSelected.estaTransporteAsignado()){
+            Map<String, Object> options = new HashMap<>();
+            options.put("resizable", false);
+            options.put("draggable", false);
+            options.put("modal", true);
+            options.put("width", "65%");
+            options.put("contentWidth","100%");
+            Map<String, List<String>> params = new HashMap<>();
+            params.put("pedido", Arrays.asList(pedidoSelected.getIdPedido().toString()));
+            PrimeFaces.current().dialog().openDynamic("/extraDialog/guia_remision", options, params);
+        }else{
+            FacesUtils.addWarMessage("El estado del pedido no permite generar una guia de remision.");
+        }
     }
 
     public void onGuiaChosen(SelectEvent event) {
